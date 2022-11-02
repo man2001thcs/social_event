@@ -8,7 +8,20 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 
 import { Ionicons } from "@expo/vector-icons";
-import { HStack, Text, NativeBaseProvider, Box } from "native-base";
+import {
+  HStack,
+  Text,
+  NativeBaseProvider,
+  Box,
+  Flex,
+  Button,
+  Icon,
+  Heading,
+  Spacer,
+  IconButton,
+} from "native-base";
+
+import { AntDesign, FontAwesome5 } from "@expo/vector-icons";
 
 import Login from "./src/view/log/login";
 import BookList from "./src/view/component/book/book_list";
@@ -21,8 +34,36 @@ export default function App() {
   const Tab = createMaterialTopTabNavigator();
   return (
     <NativeBaseProvider>
-      <Box flex="1" safeAreaTop >
+      <Box flex="1" safeAreaTop mt="0">
         <NavigationContainer safeAreaTop>
+          <Flex direction="row" space={8} mr="3">
+            <Heading size="md" color="cyan.500" fontWeight="bold" ml="3" mt="1">
+              Social
+            </Heading>
+
+            <Spacer></Spacer>
+
+            <IconButton
+              colorScheme="indigo"
+              borderRadius={50}
+              mr="2"
+              _icon={{
+                as: AntDesign,
+                name: "plus",
+              }}
+              bgColor="#B5B6B0"
+            />
+
+            <IconButton
+              colorScheme="indigo"
+              borderRadius={50}
+              bgColor="#B5B6B0"
+              _icon={{
+                as: AntDesign,
+                name: "search1",
+              }}
+            />
+          </Flex>
           <Tab.Navigator
             screenOptions={{
               showLabel: false,
@@ -42,9 +83,39 @@ export default function App() {
                 ),
               }}
             />
-            <Tab.Screen name="Booklist" component={BookList} />
-            <Tab.Screen name="Tutorial" component={Tutorial} />
-            <Tab.Screen name="Create_post" component={Create_post} />
+            <Tab.Screen
+              name="Booklist"
+              component={BookList}
+              options={{
+                tabBarLabel: "",
+                tabBarShowLabel: false,
+                tabBarIcon: () => (
+                  <FontAwesome5 name="user-friends" size={20} color="green" />
+                ),
+              }}
+            />
+            <Tab.Screen
+              name="Tutorial"
+              component={Tutorial}
+              options={{
+                tabBarLabel: "",
+                tabBarShowLabel: false,
+                tabBarIcon: () => (
+                  <Ionicons name="notifications" size={20} color="green" />
+                ),
+              }}
+            />
+            <Tab.Screen
+              name="Create_post"
+              component={Create_post}
+              options={{
+                tabBarLabel: "",
+                tabBarShowLabel: false,
+                tabBarIcon: () => (
+                  <Ionicons name="menu" size={22} color="green" />
+                ),
+              }}
+            />
           </Tab.Navigator>
         </NavigationContainer>
       </Box>

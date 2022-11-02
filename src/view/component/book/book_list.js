@@ -13,7 +13,7 @@ import {
 import BookCom from "./book_com";
 
 function BookList() {
-  const urlBook = "http://10.13.128.107/php_server/controller/book/list.php";
+  const urlBook = "http://10.13.65.81/php_server/controller/book/list.php";
 
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
