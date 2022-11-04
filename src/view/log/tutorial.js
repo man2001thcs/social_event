@@ -49,10 +49,11 @@ export default function Tutorial({ navigation }) {
           <IconButton
             size="md"
             variant="ghost"
-            alignSelf="flex-end"
+            alignSelf="flex-end"         
             _icon={{
               as: MaterialIcons,
               name: "menu",
+              color: "#137950",
             }}
           />
         </Flex>
@@ -89,14 +90,20 @@ export default function Tutorial({ navigation }) {
             variant="ghost"
             h="10"
             w="20"
-            endIcon={<Icon as={EvilIcons} name="like" size="md" />}
+            _text={{
+              color: "#137950",
+            }}
+            endIcon={<Icon as={EvilIcons} name="like" size="md" color="#137950" />}
           >
             Like
           </Button>
           <Button
             variant="ghost"
             h="10"
-            endIcon={<Icon as={EvilIcons} name="comment" size="md" />}
+            _text={{
+              color: "#137950",
+            }}
+            endIcon={<Icon as={EvilIcons} name="comment" size="md" color="#137950"/>}
           >
             Comment
           </Button>
@@ -104,7 +111,10 @@ export default function Tutorial({ navigation }) {
             variant="ghost"
             h="10"
             w="20"
-            endIcon={<Icon as={FontAwesome} name="share" size="md" />}
+            _text={{
+              color: "#137950",
+            }}
+            endIcon={<Icon as={FontAwesome} name="share" size="md" color="#137950" />}
           >
             Share
           </Button>

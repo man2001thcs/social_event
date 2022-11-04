@@ -37,7 +37,7 @@ export default function App() {
       <Box flex="1" safeAreaTop mt="0">
         <NavigationContainer safeAreaTop>
           <Flex direction="row" space={8} mr="3">
-            <Heading size="md" color="cyan.500" fontWeight="bold" ml="3" mt="1">
+            <Heading size="md" color="#137950" fontWeight="bold" ml="4" mt="1">
               Social
             </Heading>
 
@@ -50,17 +50,19 @@ export default function App() {
               _icon={{
                 as: AntDesign,
                 name: "plus",
+                color: "#137950",
               }}
-              bgColor="#B5B6B0"
+              bgColor="#C6C7C0"
             />
 
             <IconButton
               colorScheme="indigo"
               borderRadius={50}
-              bgColor="#B5B6B0"
+              bgColor="#C6C7C0"
               _icon={{
                 as: AntDesign,
                 name: "search1",
+                color: "#137950",
               }}
             />
           </Flex>
@@ -70,6 +72,7 @@ export default function App() {
               style: {
                 size: "14",
               },
+              tabBarIndicatorStyle: { backgroundColor: 'green' },
             }}
           >
             <Tab.Screen
