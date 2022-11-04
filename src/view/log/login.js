@@ -23,13 +23,15 @@ import {
   Button,
 } from "native-base";
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import { MaterialIcons } from "@expo/vector-icons";
 
 import { Formik, Form, Field, ErrorMessage, useFormik } from "formik";
 import * as Yup from "yup";
 import GenerateRandomCode from "react-random-code-generator";
 
-export default function App({ navigation }) {
+export default function Login({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [result, setResult] = useState("");
@@ -40,11 +42,11 @@ export default function App({ navigation }) {
   const [show, setShow] = React.useState(false);
 
   const SignupSchema = Yup.object().shape({
-    emailS: Yup.string().email("Invalid email").required("Required"),
+    emailS: Yup.string().email("Invalid email").required("Required email!"),
     passwordS: Yup.string()
-      .min(2, "Too Short!")
-      .max(70, "Too Long!")
-      .required("Required password!!"),
+      .min(2, "Require longer password!")
+      .max(70, "Password is too long!")
+      .required("Required password!"),
   });
 
   return (
@@ -74,6 +76,7 @@ export default function App({ navigation }) {
               })
                 .then((res) => res.json())
                 .then((data) => {
+
                   console.log("Success:", data);
                 })
                 .catch((error) => {
@@ -148,11 +151,11 @@ export default function App({ navigation }) {
                       </Pressable>
                     }
                   />
-                  {errors.emailS && (
+                  {errors.passwordS && (
                     <FormControl.ErrorMessage
                       leftIcon={<WarningOutlineIcon size="xs" />}
                     >
-                      {errors.emailS}
+                      {errors.passwordS}
                     </FormControl.ErrorMessage>
                   )}
                 </FormControl>
