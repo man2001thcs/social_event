@@ -3,7 +3,7 @@ import React from "react";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Platform } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
-import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+import { createStackNavigator } from "@react-navigation/stack";
 
 import { Ionicons } from "@expo/vector-icons";
 import {
@@ -24,10 +24,11 @@ import {
 
 import { AntDesign, FontAwesome5, EvilIcons } from "@expo/vector-icons";
 import SinglePost from "./component/post/single_post";
+import Create_post from "./component/post/create_post";
 
-export default function Home() {
+export default function Home({ navigation }) {
   const [show, setShow] = React.useState(false);
-
+  const Stack = createStackNavigator();
   function NewPost() {
     return (
       <HStack justifyContent="center" bgColor={"white"} py="3">
@@ -47,6 +48,7 @@ export default function Home() {
           _text={{
             color: "#137950",
           }}
+          onPress={() => navigation.navigate("Create_post")}
         >
           Bạn đang nghĩ gì?
         </Button>

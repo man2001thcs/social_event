@@ -30,13 +30,14 @@ export default function Create_post({ navigation }) {
   const [service, setService] = useState("0");
   return (
     <NativeBaseProvider>
-      <Box my="2.5" pt="2" bgColor="white">
-        <Flex direction="row" space={8} mt="3" mr="3">
+      <Box mb="2.5" bgColor="white">
+        <Flex direction="row" space={8} mr="3">
           <Button
             variant="ghost"
             h="10"
             w="20"
-            endIcon={<Icon as={Ionicons} name="arrow-back" size="xl" />}
+            endIcon={<Icon as={Ionicons} name="arrow-back" size="xl" color= "#137950"/>}
+            onPress={() => navigation.navigate("Home")}
           />
           <Heading size="md" mt="2">
             Solid
@@ -44,7 +45,12 @@ export default function Create_post({ navigation }) {
 
           <Spacer></Spacer>
 
-          <Button size="md" variant="solid" alignSelf="flex-end">
+          <Button
+            size="md"
+            variant="solid"
+            alignSelf="flex-end"
+            bgColor="#137950"
+          >
             Đăng
           </Button>
         </Flex>
@@ -90,11 +96,8 @@ export default function Create_post({ navigation }) {
                 mt={1}
                 onValueChange={(itemValue) => setService(itemValue)}
               >
-                <Select.Item label="UX Research" value="ux" />
-                <Select.Item label="Web Development" value="web" />
-                <Select.Item label="Cross Platform Development" value="cross" />
-                <Select.Item label="UI Designing" value="ui" />
-                <Select.Item label="Backend Development" value="backend" />
+                <Select.Item label="Công khai" value="Công khai" />
+                <Select.Item label="Chỉ mình tôi" value="Chỉ mình tôi" />
               </Select>
             </HStack>
           </VStack>
@@ -118,17 +121,25 @@ export default function Create_post({ navigation }) {
             bg: "muted.50",
           }}
         />
-        <HStack space={8} justifyContent="flex-start" pb="1" px="3">
+        <HStack space={4} justifyContent="flex-start" pb="1" px="3">
           <Button
             variant="ghost"
             h="10"
-            startIcon={<Icon as={FontAwesome} name="picture-o" size="md" />}
+            startIcon={
+              <Icon
+                as={FontAwesome}
+                name="picture-o"
+                size="md"
+                color="#137950"
+              />
+            }
+            _text={{ color: "#137950" }}
           >
             {"Ảnh & Video"}
           </Button>
         </HStack>
         <Divider
-          my="3"
+          my="2"
           thickness="1"
           _light={{
             bg: "muted.400",
@@ -137,17 +148,25 @@ export default function Create_post({ navigation }) {
             bg: "muted.50",
           }}
         />
-        <HStack space={8} justifyContent="flex-start" pb="1" px="3">
+        <HStack space={4} justifyContent="flex-start" pb="1" px="3">
           <Button
             variant="ghost"
             h="10"
-            startIcon={<Icon as={FontAwesome5} name="user-friends" size="md" />}
+            startIcon={
+              <Icon
+                as={FontAwesome5}
+                name="user-friends"
+                size="md"
+                color="#137950"
+              />
+            }
+            _text={{ color: "#137950" }}
           >
             Tag bạn bè
           </Button>
         </HStack>
         <Divider
-          my="3"
+          my="2"
           thickness="1"
           _light={{
             bg: "muted.400",
@@ -156,7 +175,6 @@ export default function Create_post({ navigation }) {
             bg: "muted.50",
           }}
         />
-        
       </Box>
     </NativeBaseProvider>
   );
