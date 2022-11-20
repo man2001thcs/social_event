@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 
+import link from "../../config/const";
+
 import {
   StyleSheet,
-  Text,
   View,
   Image,
   TouchableOpacity,
@@ -10,6 +11,7 @@ import {
 } from "react-native";
 
 import {
+  Text,
   Input,
   Icon,
   Stack,
@@ -21,17 +23,23 @@ import {
   Box,
   extendTheme,
   Button,
+  Divider,
+  Heading,
+  HStack,
 } from "native-base";
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { MaterialIcons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 
 import { Formik, Form, Field, ErrorMessage, useFormik } from "formik";
 import * as Yup from "yup";
 import GenerateRandomCode from "react-random-code-generator";
+import { Dimensions } from "react-native";
 
-export default function Login({ navigation }) {
+export default function Login({ codeChange, emailChange, setLogin }) {
+  const navigation = useNavigation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [result, setResult] = useState("");
@@ -49,147 +57,207 @@ export default function Login({ navigation }) {
       .required("Required password!"),
   });
 
+  const dimensions = Dimensions.get("window");
+
   return (
     <NativeBaseProvider>
-      <Box mx="4" bgColor="white" my="4" py="3">
-        <ImageBackground
-          source={"http://10.13.65.81/php_server/img/login.gif"}
-          resizeMode="cover"
-        >
-          <Box alignSelf="center">
-            <Image source={require("../../img/log/book_logo.png")} />
-          </Box>
-          <Formik
-            validationSchema={SignupSchema}
-            initialValues={{
-              emailS: "",
-              passwordS: "",
-              codeS: GenerateRandomCode.TextCode(8),
+      <Box bgColor="white" py="4" h="100%">
+        <Box alignSelf="center">
+          <Image
+            source={require("../../img/log/background.jpg")}
+            style={{
+              width: dimensions.width,
+              height: 230,
             }}
-            onSubmit={(values) => {
-              console.log(values);
-              fetch("http://10.13.65.81/php_server/controller/user/login.php", {
+          />
+        </Box>
+        <Formik
+          validationSchema={SignupSchema}
+          validateOnChange={false}
+          validateOnBlur={false}
+          initialValues={{
+            emailS: "dochu8@gmail.com",
+            passwordS: "123",
+            codeS: GenerateRandomCode.TextCode(8),
+          }}
+          onSubmit={async (values, actions) => {
+            await setIsLoaded(true);
+            await codeChange(values.codeS);
+            await emailChange(values.emailS);
+
+            fetch(
+              link.server_link +
+                "controller/user/login.php?TimeStamp=" +
+                GenerateRandomCode.TextCode(8),
+              {
                 method: "POST",
                 mode: "no-cors",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(values),
+              }
+            )
+              .then((res) => res.json())
+              .then((data) => {
+                console.log("Success:", data);
+                if (data?.response.description === "success") {
+                  setLogin(true);
+                }
+                setIsLoaded(false);
               })
-                .then((res) => res.json())
-                .then((data) => {
+              .catch((error) => {
+                console.error("Error:", error);
+                setIsLoaded(false);
+              });
 
-                  console.log("Success:", data);
-                })
-                .catch((error) => {
-                  console.error("Error:", error);
-                });
-            }}
-          >
-            {({
-              handleChange,
-              handleBlur,
-              handleSubmit,
-              values,
-              errors,
-              isValid,
-            }) => (
-              <Stack space={4} w="100%" alignItems="center" bgColor="white">
-                <FormControl isInvalid w="75%" maxW="300px">
-                  <FormControl.Label>Email</FormControl.Label>
-                  <Input
-                    name="emailS"
-                    placeholder="Enter email"
-                    onChangeText={handleChange("emailS")}
-                    onBlur={handleBlur("emailS")}
-                    value={values.emailS}
-                    InputLeftElement={
+            actions.resetForm({
+              values: {
+                // the type of `values` inferred to be Blog
+                emailS: "dochu8@gmail.com",
+                passwordS: "123",
+                codeS: GenerateRandomCode.TextCode(8),
+              },
+
+              // you can also set the other form states here
+            });
+          }}
+        >
+          {({
+            handleChange,
+            handleBlur,
+            handleSubmit,
+            isLoading,
+            values,
+            errors,
+            isValid,
+          }) => (
+            <Stack
+              space={4}
+              w="100%"
+              alignItems="center"
+              bgColor="white"
+              mt="3"
+              px="4"
+            >
+              <FormControl isInvalid={errors.emailS} w="75%" maxW="300px">
+                <FormControl.Label>Email</FormControl.Label>
+                <Input
+                  name="emailS"
+                  placeholder="Enter email"
+                  onChangeText={handleChange("emailS")}
+                  value={values.emailS}
+                  validateOnChange={false}
+                  validateOnBlur={false}
+                  InputLeftElement={
+                    <Icon
+                      as={<MaterialIcons name="person" />}
+                      size={5}
+                      ml="2"
+                      color="muted.400"
+                    />
+                  }
+                />
+                {errors.emailS && (
+                  <FormControl.ErrorMessage
+                    leftIcon={<WarningOutlineIcon size="xs" />}
+                  >
+                    {errors.emailS}
+                  </FormControl.ErrorMessage>
+                )}
+              </FormControl>
+
+              <FormControl isInvalid={errors.passwordS} w="75%" maxW="300px">
+                <FormControl.Label>Password</FormControl.Label>
+                <Input
+                  name="passwordS"
+                  placeholder="Enter password"
+                  onChangeText={handleChange("passwordS")}
+                  value={values.passwordS}
+                  type={show ? "text" : "password"}
+                  validateOnChange={false}
+                  validateOnBlur={false}
+                  InputLeftElement={
+                    <Icon
+                      as={<MaterialIcons name="vpn-key" />}
+                      size={5}
+                      ml="2"
+                      color="muted.400"
+                    />
+                  }
+                  InputRightElement={
+                    <Pressable onPress={() => setShow(!show)}>
                       <Icon
-                        as={<MaterialIcons name="person" />}
+                        as={
+                          <MaterialIcons
+                            name={show ? "visibility" : "visibility-off"}
+                          />
+                        }
                         size={5}
-                        ml="2"
+                        mr="2"
                         color="muted.400"
                       />
-                    }
-                  />
-                  {errors.emailS && (
-                    <FormControl.ErrorMessage
-                      leftIcon={<WarningOutlineIcon size="xs" />}
-                    >
-                      {errors.emailS}
-                    </FormControl.ErrorMessage>
-                  )}
-                </FormControl>
+                    </Pressable>
+                  }
+                />
+                {errors.passwordS && (
+                  <FormControl.ErrorMessage
+                    leftIcon={<WarningOutlineIcon size="xs" />}
+                  >
+                    {errors.passwordS}
+                  </FormControl.ErrorMessage>
+                )}
+              </FormControl>
 
-                <FormControl isInvalid w="75%" maxW="300px">
-                  <FormControl.Label>Password</FormControl.Label>
-                  <Input
-                    name="passwordS"
-                    placeholder="Enter password"
-                    onChangeText={handleChange("passwordS")}
-                    onBlur={handleBlur("passwordS")}
-                    value={values.passwordS}
-                    type={show ? "text" : "password"}
-                    InputLeftElement={
-                      <Icon
-                        as={<MaterialIcons name="vpn-key" />}
-                        size={5}
-                        ml="2"
-                        color="muted.400"
-                      />
-                    }
-                    InputRightElement={
-                      <Pressable onPress={() => setShow(!show)}>
-                        <Icon
-                          as={
-                            <MaterialIcons
-                              name={show ? "visibility" : "visibility-off"}
-                            />
-                          }
-                          size={5}
-                          mr="2"
-                          color="muted.400"
-                        />
-                      </Pressable>
-                    }
-                  />
-                  {errors.passwordS && (
-                    <FormControl.ErrorMessage
-                      leftIcon={<WarningOutlineIcon size="xs" />}
-                    >
-                      {errors.passwordS}
-                    </FormControl.ErrorMessage>
-                  )}
-                </FormControl>
-
-                <TouchableOpacity>
-                  <Text>
-                    New user, Sign in here{" "}
-                    <Text onPress={() => navigation.navigate("SignIn")}>
-                      ...
-                    </Text>
+              <TouchableOpacity>
+                <Text>
+                  Forgot password? Click
+                  <Text
+                    bold
+                    underline
+                    italic
+                    onPress={() => navigation.navigate("SignIn")}
+                  >
+                    {" "}
+                    here
                   </Text>
-                </TouchableOpacity>
-
-                <Button title="Login" onPress={() => handleSubmit()}>
+                </Text>
+              </TouchableOpacity>
+              <HStack px="4">
+                <Button
+                  title="Login"
+                  w="100%"
+                  onPress={() => handleSubmit()}
+                  bgColor="#137950"
+                  isLoading={isLoading}
+                  isLoadingText="Đang đăng nhập"
+                >
                   Login
                 </Button>
+              </HStack>
 
+              <HStack px="4">
+                <Divider
+                  my="2"
+                  thickness="1"
+                  _light={{
+                    bg: "muted.400",
+                  }}
+                  _dark={{
+                    bg: "muted.50",
+                  }}
+                />
+              </HStack>
+              <HStack px="4">
                 <Button
-                  title="Go to Details"
-                  onPress={() => navigation.navigate("BookList")}
+                  w="100%"
+                  title="Sign In"
+                  onPress={() => navigation.navigate("Sign in")}
                 >
-                  Go to Details
+                  Sign up
                 </Button>
-
-                <Button
-                  title="Go to Tutorial"
-                  onPress={() => navigation.navigate("Tutorial")}
-                >
-                  Tutorial
-                </Button>
-              </Stack>
-            )}
-          </Formik>
-        </ImageBackground>
+              </HStack>
+            </Stack>
+          )}
+        </Formik>
       </Box>
     </NativeBaseProvider>
   );

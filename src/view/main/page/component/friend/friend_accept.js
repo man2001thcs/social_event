@@ -56,7 +56,7 @@ export default function FriendAccept(props) {
             </VStack>
           </Flex>
           <HStack>
-            <Button variant="solid" mr="3" px="7">
+            <Button variant="solid" mr="3" px="7" bgColor="#137950">
               Chấp nhận
             </Button>
             <Button variant="solid" px="7" bgColor="#B5B6B0">

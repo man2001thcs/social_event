@@ -1,86 +1,148 @@
-import React, {useState} from 'react';
+import React, { useState } from "react";
+import link from "../../config/const";
+
 import {
   StyleSheet,
   Text,
   View,
   Image,
-  Button,
   TouchableOpacity,
-  FlatList,
-  ScrollView,
-  SafeAreaView,
-} from 'react-native';
-import {TextInput} from '@react-native-material/core';
-import {Formik, Form, Field, ErrorMessage, useFormik} from 'formik';
-import * as Yup from 'yup';
-import GenerateRandomCode from 'react-random-code-generator';
+  ImageBackground,
+} from "react-native";
 
-export default function SignIn({navigation}) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [result, setResult] = useState('');
+import {
+  Input,
+  Icon,
+  Stack,
+  Pressable,
+  Center,
+  NativeBaseProvider,
+  FormControl,
+  WarningOutlineIcon,
+  Box,
+  extendTheme,
+  Button,
+  Divider,
+  Heading,
+  Flex,
+  Spacer,
+  ScrollView,
+  HStack,
+} from "native-base";
+
+import { Ionicons } from "@expo/vector-icons";
+import { EvilIcons } from "@expo/vector-icons";
+import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
+import { CheckIcon } from "@expo/vector-icons";
+
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import { MaterialIcons } from "@expo/vector-icons";
+
+import { Formik, Form, Field, ErrorMessage, useFormik } from "formik";
+import * as Yup from "yup";
+import GenerateRandomCode from "react-random-code-generator";
+import { Dimensions } from "react-native";
+
+export default function SignIn({ navigation }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [result, setResult] = useState("");
 
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
+  const [show, setShow] = React.useState(false);
+  
+  const dimensions = Dimensions.get("window");
+
   const SignupSchema = Yup.object().shape({
-    emailS: Yup.string().email('Invalid email').required('Required'),
+    emailS: Yup.string().email("Invalid email").required("Required email!"),
     passwordS: Yup.string()
-      .min(2, 'Too Short!')
-      .max(70, 'Too Long!')
-      .required('Required password!!'),
+      .min(2, "Require longer password!")
+      .max(70, "Password is too long!")
+      .required("Required password!"),
     re_passwordS: Yup.string()
-      .oneOf([Yup.ref('passwordS'), null], "Passwords don't match!")
-      .min(2, 'Too Short!')
-      .max(70, 'Too Long!')
-      .required('Required password!!'),
+      .oneOf([Yup.ref("passwordS"), null], "Passwords don't match!")
+      .min(2, "Require longer password!")
+      .max(70, "Password is too long!")
+      .required("Required password!"),
     fullname: Yup.string()
-      .min(2, 'Too Short!')
-      .max(70, 'Too Long!')
-      .required('Required name!!'),
+      .min(2, "Too Short!")
+      .max(70, "Too Long!")
+      .required("Required name!!"),
     address: Yup.string()
-      .min(2, 'Too Short!')
-      .max(100, 'Too Long!')
-      .required('Required address!!'),
-    phone_number: Yup.number('Invalid number!!').required('Required number!!'),
+      .min(2, "Too Short!")
+      .max(100, "Too Long!")
+      .required("Required address!!"),
+    phone_number: Yup.number("Invalid number!!").required("Required number!!"),
   });
 
   return (
-    <SafeAreaView style={styles.container}>
+    <NativeBaseProvider>
       <ScrollView>
-        <View style={styles.container_sub}>
-          <Image
-            style={styles.image}
-            source={require('../../src/img/log/book_logo.png')}
-          />
+        <Box bgColor="white">
+          <Flex direction="row" space={8} mb="4">
+            <Button
+              variant="ghost"
+              h="10"
+              w="20"
+              endIcon={
+                <Icon
+                  as={Ionicons}
+                  name="arrow-back"
+                  size="xl"
+                  color="#137950"
+                />
+              }
+              onPress={() => navigation.navigate("Login")}
+            />
+            <Heading size="md" mt="2">
+              Đăng kí
+            </Heading>
+
+            <Spacer></Spacer>
+          </Flex>
+
+          <Box alignSelf="center" mb="4">
+            <Image
+              source={require("../../img/log/background.jpg")}
+              style={{
+                width: dimensions.width,
+                height: 230,
+              }}
+            />
+          </Box>
           <Formik
             validationSchema={SignupSchema}
+            validateOnChange={false}
+            validateOnBlur={false}
             initialValues={{
-              emailS: '',
-              passwordS: '',
-              fullname: '',
-              address: '',
-              phone_number: '',
+              emailS: "",
+              passwordS: "",
+              re_passwordS: "",
+              fullname: "",
+              phone_number: "",
+              address: "",
+              codeS: GenerateRandomCode.TextCode(8),
             }}
-            onSubmit={values => {
+            onSubmit={(values) => {
               console.log(values);
-              fetch(
-                'http://192.168.1.189/php_server/controller/user/sign_in.php',
-                {
-                  method: 'POST',
-                  mode: 'no-cors',
-                  headers: {'Content-Type': 'application/json'},
-                  body: JSON.stringify(values),
-                },
-              )
-                .then(res => res.json())
-                .then(data => {
-                  console.log('Success:', data);
+              fetch(link.server_link + "controller/user/sign_in.php", {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(values),
+              })
+                .then((res) => res.json())
+                .then((data) => {
+                  console.log("Success:", data);
                 })
-                .catch(error => {
-                  console.error('Error:', error);
+                .catch((error) => {
+                  console.error("Error:", error);
                 });
-            }}>
+            }}
+          >
             {({
               handleChange,
               handleBlur,
@@ -89,166 +151,199 @@ export default function SignIn({navigation}) {
               errors,
               isValid,
             }) => (
-              <View>
-                <TextInput
-                  name="emailS"
-                  label="Email Address"
-                  style={styles.textInput}
-                  onChangeText={handleChange('emailS')}
-                  onBlur={handleBlur('emailS')}
-                  value={values.emailS}
-                  keyboardType="email-address"
-                />
-                {errors.emailS && (
-                  <Text style={{fontSize: 10, color: 'red'}}>
-                    {errors.emailS}
-                  </Text>
-                )}
-
-                <TextInput
-                  name="passwordS"
-                  label="New password"
-                  style={styles.textInput}
-                  onChangeText={handleChange('passwordS')}
-                  onBlur={handleBlur('passwordS')}
-                  value={values.new_passwordS}
-                  secureTextEntry
-                />
-                {errors.passwordS && (
-                  <Text style={{fontSize: 10, color: 'red'}}>
-                    {errors.passwordS}
-                  </Text>
-                )}
-
-                <TextInput
-                  name="re_passwordS"
-                  label="Re-enter password"
-                  style={styles.textInput}
-                  onChangeText={handleChange('re_passwordS')}
-                  onBlur={handleBlur('re_passwordS')}
-                  value={values.re_new_passwordS}
-                  secureTextEntry
-                />
-                {errors.re_passwordS && (
-                  <Text style={{fontSize: 10, color: 'red'}}>
-                    {errors.re_passwordS}
-                  </Text>
-                )}
-
-                <TextInput
-                  name="fullname"
-                  label="Full name"
-                  style={styles.textInput}
-                  onChangeText={handleChange('fullname')}
-                  onBlur={handleBlur('fullname')}
-                  value={values.fullname}
-                />
-                {errors.fullname && (
-                  <Text style={{fontSize: 10, color: 'red'}}>
-                    {errors.fullname}
-                  </Text>
-                )}
-
-                <TextInput
-                  name="address"
-                  label="Address"
-                  style={styles.textInput}
-                  onChangeText={handleChange('address')}
-                  onBlur={handleBlur('address')}
-                  value={values.address}
-                />
-                {errors.address && (
-                  <Text style={{fontSize: 10, color: 'red'}}>
-                    {errors.address}
-                  </Text>
-                )}
-
-                <TextInput
-                  label="Phone number"
-                  name="phone_number"
-                  style={styles.textInput}
-                  onChangeText={handleChange('phone_number')}
-                  onBlur={handleBlur('phone_number')}
-                  value={values.phone_number}
-                />
-                {errors.phone_number && (
-                  <Text style={{fontSize: 10, color: 'red'}}>
-                    {errors.phone_number}
-                  </Text>
-                )}
-
-                <TouchableOpacity>
-                  <Text style={styles.forgot_button}>Forgot Password?</Text>
-                </TouchableOpacity>
-                <View style={styles.loginBtnGroup}>
-                  <Button title="Login" onPress={() => handleSubmit()} />
-                </View>
-                <View style={styles.loginBtnGroup}>
-                  <Button
-                    title="Go to Details"
-                    onPress={() => navigation.navigate('BookList')}
-                    style={styles.loginBtn}
+              <Stack
+                space={4}
+                w="100%"
+                alignItems="center"
+                bgColor="white"
+                px="3"
+              >
+                <FormControl isInvalid={errors.emailS} w="75%" maxW="300px">
+                  <FormControl.Label>Email</FormControl.Label>
+                  <Input
+                    name="emailS"
+                    placeholder="Enter email"
+                    onChangeText={handleChange("emailS")}
+                    onBlur={handleBlur("emailS")}
+                    value={values.emailS}
+                    InputLeftElement={
+                      <Icon
+                        as={<MaterialIcons name="person" />}
+                        size={5}
+                        ml="2"
+                        color="muted.400"
+                      />
+                    }
                   />
-                </View>
-              </View>
+                  {errors.emailS && (
+                    <FormControl.ErrorMessage
+                      leftIcon={<WarningOutlineIcon size="xs" />}
+                    >
+                      {errors.emailS}
+                    </FormControl.ErrorMessage>
+                  )}
+                </FormControl>
+
+                <FormControl isInvalid={errors.passwordS} w="75%" maxW="300px">
+                  <FormControl.Label>Password</FormControl.Label>
+                  <Input
+                    name="passwordS"
+                    placeholder="Enter password"
+                    onChangeText={handleChange("passwordS")}
+                    onBlur={handleBlur("passwordS")}
+                    value={values.passwordS}
+                    type={show ? "text" : "password"}
+                    InputLeftElement={
+                      <Icon
+                        as={<MaterialIcons name="vpn-key" />}
+                        size={5}
+                        ml="2"
+                        color="muted.400"
+                      />
+                    }
+                    InputRightElement={
+                      <Pressable onPress={() => setShow(!show)}>
+                        <Icon
+                          as={
+                            <MaterialIcons
+                              name={show ? "visibility" : "visibility-off"}
+                            />
+                          }
+                          size={5}
+                          mr="2"
+                          color="muted.400"
+                        />
+                      </Pressable>
+                    }
+                  />
+                  {errors.passwordS && (
+                    <FormControl.ErrorMessage
+                      leftIcon={<WarningOutlineIcon size="xs" />}
+                    >
+                      {errors.passwordS}
+                    </FormControl.ErrorMessage>
+                  )}
+                </FormControl>
+
+                <FormControl
+                  isInvalid={errors.re_passwordS}
+                  w="75%"
+                  maxW="300px"
+                >
+                  <FormControl.Label>Re-enter password</FormControl.Label>
+                  <Input
+                    name="re_passwordS"
+                    placeholder="Re-enter password"
+                    onChangeText={handleChange("re_passwordS")}
+                    onBlur={handleBlur("re_passwordS")}
+                    value={values.re_passwordS}
+                    type={"password"}
+                    InputLeftElement={
+                      <Icon
+                        as={<MaterialIcons name="vpn-key" />}
+                        size={5}
+                        ml="2"
+                        color="muted.400"
+                      />
+                    }
+                  />
+                  {errors.re_passwordS && (
+                    <FormControl.ErrorMessage
+                      leftIcon={<WarningOutlineIcon size="xs" />}
+                    >
+                      {errors.re_passwordS}
+                    </FormControl.ErrorMessage>
+                  )}
+                </FormControl>
+
+                <FormControl isInvalid={errors.fullname} w="75%" maxW="300px">
+                  <FormControl.Label>Full name</FormControl.Label>
+                  <Input
+                    name="fullname"
+                    placeholder="Enter name"
+                    onChangeText={handleChange("fullname")}
+                    onBlur={handleBlur("fullname")}
+                    value={values.fullname}
+                    type={"text"}
+                  />
+                  {errors.fullname && (
+                    <FormControl.ErrorMessage
+                      leftIcon={<WarningOutlineIcon size="xs" />}
+                    >
+                      {errors.fullname}
+                    </FormControl.ErrorMessage>
+                  )}
+                </FormControl>
+
+                <FormControl isInvalid={errors.address} w="75%" maxW="300px">
+                  <FormControl.Label>Address</FormControl.Label>
+                  <Input
+                    name="address"
+                    placeholder="Enter address"
+                    onChangeText={handleChange("address")}
+                    onBlur={handleBlur("address")}
+                    value={values.address}
+                    type={"text"}
+                  />
+                  {errors.address && (
+                    <FormControl.ErrorMessage
+                      leftIcon={<WarningOutlineIcon size="xs" />}
+                    >
+                      {errors.address}
+                    </FormControl.ErrorMessage>
+                  )}
+                </FormControl>
+
+                <FormControl
+                  isInvalid={errors.phone_number}
+                  w="75%"
+                  maxW="300px"
+                >
+                  <FormControl.Label>Phone number</FormControl.Label>
+                  <Input
+                    name="phone_number"
+                    placeholder="Enter phone number"
+                    onChangeText={handleChange("phone_number")}
+                    onBlur={handleBlur("phone_number")}
+                    value={values.phone_number}
+                    type={"text"}
+                  />
+                  {errors.phone_number && (
+                    <FormControl.ErrorMessage
+                      leftIcon={<WarningOutlineIcon size="xs" />}
+                    >
+                      {errors.phone_number}
+                    </FormControl.ErrorMessage>
+                  )}
+                </FormControl>
+
+                <HStack px="4">
+                  <Divider
+                    my="2"
+                    thickness="1"
+                    _light={{
+                      bg: "muted.400",
+                    }}
+                    _dark={{
+                      bg: "muted.50",
+                    }}
+                  />
+                </HStack>
+                <HStack px="4" mb="12">
+                  <Button
+                    title="Login"
+                    w="100%"
+                    onPress={() => handleSubmit()}
+                    bgColor="#137950"
+                  >
+                    Submit
+                  </Button>
+                </HStack>
+              </Stack>
             )}
           </Formik>
-        </View>
+        </Box>
       </ScrollView>
-    </SafeAreaView>
+    </NativeBaseProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  scrollView: {
-    backgroundColor: 'pink',
-    marginHorizontal: 20,
-  },
-
-  container_sub: {
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-    background: `url(${'http://192.168.1.189/php_server/img/login.gif'}) center center no-repeat`,
-  },
-
-  image: {
-    marginBottom: 40,
-  },
-
-  textInput: {
-    height: 40,
-    width: 250,
-    margin: 20,
-    backgroundColor: 'white',
-    borderColor: 'gray',
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 5,
-  },
-
-  forgot_button: {
-    height: 30,
-    marginBottom: 30,
-  },
-
-  loginBtnGroup: {
-    borderRadius: 25,
-    height: 50,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 5,
-    marginBottom: 5,
-  },
-  loginBtn: {
-    width: 400,
-    borderRadius: 25,
-    height: 50,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 5,
-    marginBottom: 5,
-  },
-});

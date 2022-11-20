@@ -8,7 +8,10 @@ import {
   NavigationContainer,
   getFocusedRouteNameFromRoute,
 } from "@react-navigation/native";
-import { createStackNavigator, TransitionPresets } from "@react-navigation/stack";
+import {
+  createStackNavigator,
+  TransitionPresets,
+} from "@react-navigation/stack";
 
 import { Ionicons } from "@expo/vector-icons";
 import {
@@ -26,39 +29,61 @@ import {
 
 import Main from "./src/view/main/main";
 import Login from "./src/view/log/login";
+import SignIn from "./src/view/log/signin";
 import Create_post from "./src/view/main/page/component/post/create_post";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import link from "./src/config/const";
+import GenerateRandomCode from "react-random-code-generator";
 
 export default function App() {
   const [show, setShow] = useState(false);
-  const [logined, setLogin] = useState(true);
+  const [logined, setLogin] = useState(false);
   const [error, setError] = useState(null);
   const Stack = createStackNavigator();
 
+  const [email_login, setEmailLogin] = useState("");
+  const [code_login, setCodeLogin] = useState("");
+
+
+  console.log(code_login);
+
+  const childToParent = (data) => {
+    setCodeLogin(data);
+    console.log("aa");
+  };
+
+  /*
   useEffect(() => {
-    fetch(link.user_link, {
-      mode: "no-cors",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      credentials: "same-origin",
-    })
-      .then((res) => res.json())
-      .then(
-        (result) => {
-          setLogin(true);
-          console.log(JSON.parse(JSON.stringify(result)) ?? []);
+    if (code_login !== "") {
+      const account_link =
+        link.user_link +
+        code_login +
+        ".json" +
+        "?timeStamp=" +
+        GenerateRandomCode.TextCode(8);
+      console.log(account_link);
+      fetch(account_link, {
+        mode: "no-cors",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
         },
-        // Note: it's important to handle errors here
-        // instead of a catch() block so that we don't swallow
-        // exceptions from actual bugs in components.
-        (error) => {
-          setError(error);
-        }
-      );
-  }, []);
+        credentials: "same-origin",
+      })
+        .then((res) => res.json())
+        .then((json) => {
+          console.log("Success:", json);
+          setLogin(true);
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
+    } else console.log("abc");
+  }, [code_login, email_login]);
+  */
+
+  console.log(code_login, email_login);
 
   function getHeaderTitle(route) {
     // If the focused route is not found, we need to assume it's the initial screen
@@ -88,7 +113,9 @@ export default function App() {
             />
             <Stack.Screen
               name="Create_post"
-              component={Create_post}
+              children={() => (
+                <Create_post codeS={code_login} emailS={email_login}></Create_post>
+              )}
               options={{
                 headerShown: false,
                 gestureEnabled: true,
@@ -100,8 +127,26 @@ export default function App() {
         </NavigationContainer>
       );
     } else {
-      console.log("fuck");
-      return <Login />;
+      return (
+        <NavigationContainer>
+          <Stack.Navigator>
+            <Stack.Screen
+              name="Login"
+              children={() => (
+                <Login codeS={code_login} setLogin={setLogin} codeChange={setCodeLogin} emailChange={setEmailLogin}></Login>
+              )}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="Sign in"
+              component={SignIn}
+              options={{
+                headerShown: false,
+              }}
+            />
+          </Stack.Navigator>
+        </NavigationContainer>
+      );
     }
   };
 

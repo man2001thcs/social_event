@@ -76,16 +76,19 @@ export default function Home({ navigation }) {
           author_name={"chu do"}
           post_body={"aaaaaaaaaaaaaaaaaaaaaaaaaaaa \n aa"}
           comment_num={"12"}
+          img_num={4}
         />
         <SinglePost
           author_name={"chu do"}
           post_body={"aaaaaaaaaaaaaaaaaaaaaaaaaaaa \n aa"}
           comment_num={"12"}
+          img_num={2}
         />
         <SinglePost
           author_name={"chu do"}
           post_body={"aaaaaaaaaaaaaaaaaaaaaaaaaaaa \n aa"}
           comment_num={"12"}
+          img_num={1}
         />
       </ScrollView>
     </Box>

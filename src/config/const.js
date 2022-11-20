@@ -1,7 +1,8 @@
 const client_link = "http://localhost:3000/";
 
 //Server link
-const server_link = "http://localhost/php_social/";
+const server_link = "http://192.168.1.153/php_social/";
+
 //
 
 //other link
