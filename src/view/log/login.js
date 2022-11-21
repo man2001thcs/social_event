@@ -102,12 +102,12 @@ export default function Login({ codeChange, emailChange, setLogin }) {
                 if (data?.response.description === "success") {
                   setLogin(true);
                 }
-                setIsLoaded(false);
               })
               .catch((error) => {
                 console.error("Error:", error);
-                setIsLoaded(false);
               });
+              
+              actions.setSubmitting(false);
 
             actions.resetForm({
               values: {
@@ -125,6 +125,7 @@ export default function Login({ codeChange, emailChange, setLogin }) {
             handleChange,
             handleBlur,
             handleSubmit,
+            isSubmitting,
             isLoading,
             values,
             errors,
@@ -227,7 +228,7 @@ export default function Login({ codeChange, emailChange, setLogin }) {
                   w="100%"
                   onPress={() => handleSubmit()}
                   bgColor="#137950"
-                  isLoading={isLoading}
+                  isLoading={isSubmitting}
                   isLoadingText="Đang đăng nhập"
                 >
                   Login

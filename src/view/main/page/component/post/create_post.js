@@ -46,8 +46,10 @@ import * as ImagePicker from "expo-image-picker";
 import link from "../../../../../config/const";
 import image_show from "./img_up_show";
 import GenerateRandomCode from "react-random-code-generator";
+import { useNavigation } from "@react-navigation/native";
 
-export default function Create_post({ navigation, emailS, codeS }) {
+export default function Create_post({emailS, codeS }) {
+  const navigation = useNavigation();
   const [service, setService] = useState("0");
   const dimensions = Dimensions.get("window");
   const mime = require("mime");
@@ -74,6 +76,18 @@ export default function Create_post({ navigation, emailS, codeS }) {
 
       if (!result.canceled) {
         setImage(result);
+      }
+    }
+  };
+
+  const getImageNum = (images) => {
+    if (images === null) {
+      return 0;
+    } else {
+      if (images?.selected === undefined) {
+        return 1;
+      } else {
+        return images?.selected.length;
       }
     }
   };
@@ -121,7 +135,7 @@ export default function Create_post({ navigation, emailS, codeS }) {
         name: i + 1 + ".png",
       });
 
-      console.log(payload);
+      //console.log(payload);
 
       const config = {
         body: payload,
@@ -147,11 +161,11 @@ export default function Create_post({ navigation, emailS, codeS }) {
         });
     }
   }
-  console.log(images);
+  //console.log(images);
 
   return (
     <NativeBaseProvider>
-      <ScrollView>
+      <ScrollView mt="2.5">
         <Formik
           validationSchema={SignupSchema}
           validateOnChange={false}
@@ -160,15 +174,9 @@ export default function Create_post({ navigation, emailS, codeS }) {
             emailS: emailS,
             codeS: codeS,
             post_body: "",
-            img_num:
-              images === null
-                ? 0
-                : images?.selected !== undefined
-                ? images.selected.length
-                : 1,
+            img_num: getImageNum(images),
           }}
           onSubmit={async (values, actions) => {
-            /*
             await fetch(
               link.server_link +
                 "controller/post/create.php?timeStamp=" +
@@ -180,16 +188,13 @@ export default function Create_post({ navigation, emailS, codeS }) {
                 body: JSON.stringify(values),
               }
             )
-              .then((res) => res.text())
+              .then((res) => res.json())
               .then((data) => {
                 console.log("Success:", data);
-                setIsLoaded(false);
               })
               .catch((error) => {
                 console.error("Error:", error);
-                setIsLoaded(false);
               });
-            */
 
             if (images !== undefined && images !== null) {
               if (images.selected === undefined) {
@@ -199,18 +204,15 @@ export default function Create_post({ navigation, emailS, codeS }) {
               }
             }
 
+            actions.setSubmitting(false);
+
             actions.resetForm({
               values: {
                 // the type of `values` inferred to be Blog
                 emailS: emailS,
                 codeS: codeS,
                 post_body: "123",
-                img_num:
-                  images === null
-                    ? 0
-                    : images?.selected !== undefined
-                    ? images.selected.length
-                    : 1,
+                img_num: getImageNum(images),
               },
 
               // you can also set the other form states here
@@ -221,6 +223,7 @@ export default function Create_post({ navigation, emailS, codeS }) {
             handleChange,
             handleBlur,
             handleSubmit,
+            isSubmitting,
             values,
             errors,
             isValid,
@@ -252,11 +255,10 @@ export default function Create_post({ navigation, emailS, codeS }) {
                   variant="solid"
                   alignSelf="flex-end"
                   bgColor="#137950"
-                  onPress={async () => {
-                    await setIsLoaded(true);
-                    await handleSubmit();
+                  onPress={() => {
+                    handleSubmit();
                   }}
-                  isLoading={!isLoaded}
+                  isLoading={isSubmitting}
                   isLoadingText="Đang tạo"
                 >
                   Đăng
