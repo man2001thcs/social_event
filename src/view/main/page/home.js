@@ -1,7 +1,7 @@
 import React from "react";
 
 import { MaterialIcons } from "@expo/vector-icons";
-import { Platform } from "react-native";
+import { Platform, FlatList, SectionList } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 
@@ -16,6 +16,7 @@ import {
   Icon,
   Heading,
   Spacer,
+  Spinner,
   IconButton,
   Avatar,
   Center,
@@ -25,10 +26,104 @@ import {
 import { AntDesign, FontAwesome5, EvilIcons } from "@expo/vector-icons";
 import SinglePost from "./component/post/single_post";
 import Create_post from "./component/post/create_post";
+import GenerateRandomCode from "react-random-code-generator";
 
-export default function Home({ navigation }) {
+import link from "../../../config/const";
+
+function Home({ navigation }) {
   const [show, setShow] = React.useState(false);
+  const [showNumber, setShowNumber] = React.useState(0);
+
+  const [refresh_now, setRefresh] = React.useState(false);
+  const [load_more, setLoadMore] = React.useState(false);
+  const [cant_load_more, setCantLoadMore] = React.useState(false);
+  const [post_list, setPostList] = React.useState([]);
+
   const Stack = createStackNavigator();
+
+  const fetchData = async () => {
+    if (!cant_load_more || post_list.length === 0) {
+      const getPost_link =
+        link.post_link + "?timeStamp=" + GenerateRandomCode.TextCode(8);
+
+      var values = { offset: showNumber, limit: 5 };
+
+      await fetch(getPost_link, {
+        mode: "no-cors",
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(values),
+        credentials: "same-origin",
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          console.log("Success:", data);
+
+          if (parseInt(data?.response.id) === 0) {
+            setCantLoadMore(true);
+          } else if (parseInt(data?.response.id) === 1) {
+            setShowNumber(showNumber + 5);
+            let response_data = JSON.parse(data?.response.data);
+            console.log(response_data);
+
+            if (post_list.length === 0) {
+              setPostList(response_data);
+            } else {
+              setPostList([...post_list, ...response_data]);
+            }
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
+    }
+    setLoadMore(false);
+  };
+
+  const refreshData = async () => {
+    const getPost_link =
+      link.post_link + "?timeStamp=" + GenerateRandomCode.TextCode(8);
+
+    var values = { offset: 0, limit: 5 };
+
+    await fetch(getPost_link, {
+      mode: "no-cors",
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify(values),
+      credentials: "same-origin",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Success:", data);
+
+        if (parseInt(data?.response.id) === 0) {
+          setCantLoadMore(true);
+        } else if (parseInt(data?.response.id) === 1) {
+          let response_data = JSON.parse(data?.response.data);
+          //console.log(response_data);
+          setPostList(response_data);
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+      
+    setShowNumber(5);
+    setCantLoadMore(false);
+    setRefresh(false);
+  };
+
+  React.useEffect(() => {
+    fetchData();
+  }, []);
+
   function NewPost() {
     return (
       <HStack justifyContent="center" bgColor={"white"} py="3">
@@ -68,29 +163,64 @@ export default function Home({ navigation }) {
     );
   }
 
+  const renderItem = ({ item }) => {
+    return (
+      <SinglePost
+        id={item?.Post.id}
+        author_name={item?.Post.user_id}
+        post_body={item?.Post.post_body}
+        img_num={item?.Post.img_num}
+        comment_num={12}
+      />
+    );
+  };
+
+  const memoizedList = React.useMemo(() => {
+    return post_list;
+  }, [post_list]);
+
+  const memoizedValue = React.useMemo(() => renderItem, [showNumber]);
+
+  const LoadingScreen = () => {
+    return (
+      <HStack space={2} justifyContent="center" py="4" bgcolor="white">
+        <Spinner accessibilityLabel="Loading posts" />
+        <Heading color="primary.500" fontSize="md">
+          Loading
+        </Heading>
+      </HStack>
+    );
+  };
+
+  const memoLoadingScreen = React.useMemo(() => LoadingScreen, [post_list]);
+
   return (
     <Box flex="1" mt="0">
-      <ScrollView>
-        {NewPost()}
-        <SinglePost
-          author_name={"chu do"}
-          post_body={"aaaaaaaaaaaaaaaaaaaaaaaaaaaa \n aa"}
-          comment_num={"12"}
-          img_num={4}
+      <HStack>
+        <FlatList
+          data={memoizedList}
+          renderItem={memoizedValue}
+          keyExtractor={(item) => item?.Post.id}
+          ListHeaderComponent={() => {
+            return NewPost();
+          }}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={!cant_load_more && memoLoadingScreen()}
+          onEndReached={() => {
+            if (!load_more && !cant_load_more) {
+              setLoadMore(true);
+              fetchData();
+            }
+          }}
+          refreshing={refresh_now}
+          onRefresh={() => {
+            setRefresh(true);
+            refreshData();
+          }}
         />
-        <SinglePost
-          author_name={"chu do"}
-          post_body={"aaaaaaaaaaaaaaaaaaaaaaaaaaaa \n aa"}
-          comment_num={"12"}
-          img_num={2}
-        />
-        <SinglePost
-          author_name={"chu do"}
-          post_body={"aaaaaaaaaaaaaaaaaaaaaaaaaaaa \n aa"}
-          comment_num={"12"}
-          img_num={1}
-        />
-      </ScrollView>
+      </HStack>
     </Box>
   );
 }
+
+export default React.memo(Home);
