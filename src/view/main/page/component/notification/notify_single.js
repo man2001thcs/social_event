@@ -21,7 +21,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { EvilIcons } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 
-export default function NotifySingle(props) {
+function NotifySingle(props) {
   return (
     <Box my="2.5" mx="2" px="1" pt="2" bgColor="white" flex="1">
       <HStack direction="row" space={8} px="3" mt="3">
@@ -61,3 +61,5 @@ export default function NotifySingle(props) {
     </Box>
   );
 }
+
+export default React.memo(NotifySingle);

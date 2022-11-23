@@ -22,7 +22,7 @@ import { Dimensions } from "react-native";
 
 export default function image_show(img_asset) {
   const img_num = img_asset.length;
-  console.log(img_asset);
+  //console.log(img_asset);
 
   const dimensions = Dimensions.get("window");
 

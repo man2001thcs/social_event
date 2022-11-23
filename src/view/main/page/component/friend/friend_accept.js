@@ -21,7 +21,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { EvilIcons } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 
-export default function FriendAccept(props) {
+function FriendAccept(props) {
   return (
     <Box my="2.5" mx="2" px="1" pt="1" bgColor="white">
       <HStack direction="row" space={8} px="2" mt="3">
@@ -68,3 +68,5 @@ export default function FriendAccept(props) {
     </Box>
   );
 }
+
+export default React.memo(FriendAccept);

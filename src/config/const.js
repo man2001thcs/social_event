@@ -6,17 +6,13 @@ const server_link = "http://192.168.1.153/php_social/";
 //
 
 //other link
-const image_link = server_link + "img/book/";
+const image_link = server_link + "img/post/";
 
 const login_img_link = server_link + "img/login.gif";
 
 const user_link = server_link + "controller/user/log_session/";
 
-const receive_link = server_link + "controller/receive/log_session/";
-
-const buylog_link = server_link + "controller/buy_log/log_session/";
-
-const voucher_link = server_link + "controller/voucher/log_session/";
+const post_link = server_link + "controller/post/list.php";
 //
 
 export default {
@@ -24,8 +20,6 @@ export default {
   server_link,
   image_link,
   user_link,
-  receive_link,
-  buylog_link,
-  voucher_link,
+  post_link,
   login_img_link,
 };

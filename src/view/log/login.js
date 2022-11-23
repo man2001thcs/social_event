@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { memo, useState } from "react";
 
 import link from "../../config/const";
 
@@ -38,7 +38,7 @@ import * as Yup from "yup";
 import GenerateRandomCode from "react-random-code-generator";
 import { Dimensions } from "react-native";
 
-export default function Login({ codeChange, emailChange, setLogin }) {
+function Login({ codeChange, emailChange, setLogin, logined }) {
   const navigation = useNavigation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -81,11 +81,7 @@ export default function Login({ codeChange, emailChange, setLogin }) {
             codeS: GenerateRandomCode.TextCode(8),
           }}
           onSubmit={async (values, actions) => {
-            await setIsLoaded(true);
-            await codeChange(values.codeS);
-            await emailChange(values.emailS);
-
-            fetch(
+            await fetch(
               link.server_link +
                 "controller/user/login.php?TimeStamp=" +
                 GenerateRandomCode.TextCode(8),
@@ -101,13 +97,22 @@ export default function Login({ codeChange, emailChange, setLogin }) {
                 console.log("Success:", data);
                 if (data?.response.description === "success") {
                   setLogin(true);
+                  codeChange(values.codeS);
+                  emailChange(values.emailS);
+                  actions.setSubmitting(false);
+                } else {
+                  alert("Đăng nhập thất bại, vui lòng thử lại sau");
                 }
               })
               .catch((error) => {
                 console.error("Error:", error);
               });
-              
-              actions.setSubmitting(false);
+
+            setTimeout(() => {
+              if (!logined) {
+                actions.setSubmitting(false);
+              }
+            }, 5000);
 
             actions.resetForm({
               values: {
@@ -126,7 +131,6 @@ export default function Login({ codeChange, emailChange, setLogin }) {
             handleBlur,
             handleSubmit,
             isSubmitting,
-            isLoading,
             values,
             errors,
             isValid,
@@ -263,3 +267,5 @@ export default function Login({ codeChange, emailChange, setLogin }) {
     </NativeBaseProvider>
   );
 }
+
+export default memo(Login);

@@ -2,7 +2,7 @@ import React from "react";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 import { MaterialIcons } from "@expo/vector-icons";
-import { Platform } from "react-native";
+import { Platform, StatusBar } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -31,13 +31,14 @@ import Home from "./page/home";
 import FriendList from "./page/friend";
 import NotifyList from "./page/notification";
 import Menu from "./page/menu";
+import { memo } from "react";
 
-export default function Main() {
+function Main() {
   const [show, setShow] = React.useState(false);
 
   const Tab = createMaterialTopTabNavigator();
   return (
-    <Box flex="1" mt="0">
+    <Box flex="1" pt="2" bgColor="white">
       <Flex direction="row" space={8} mr="3" bgColor="white">
         <Heading size="md" color="#137950" fontWeight="bold" ml="4" mt="1">
           Social
@@ -69,7 +70,10 @@ export default function Main() {
         />
       </Flex>
       <Tab.Navigator
+        initialRouteName="Home"
         screenOptions={{
+          tabBarInactiveTintColor: "#949494",
+          tabBarActiveTintColor: "#137950",
           showLabel: false,
           style: {
             size: "14",
@@ -81,21 +85,21 @@ export default function Main() {
           name="Home"
           component={Home}
           options={{
-            tabBarLabel: "",
+            tabBarLabel: "Home",
             tabBarShowLabel: false,
-            tabBarIcon: () => (
-              <Ionicons name="md-home" size={20} color="green" />
+            tabBarIcon: ({ color }) => (
+              <Ionicons name="md-home" size={20} color={color} />
             ),
           }}
         />
         <Tab.Screen
-          name="Booklist"
+          name="Friendlist"
           component={FriendList}
           options={{
             tabBarLabel: "",
             tabBarShowLabel: false,
-            tabBarIcon: () => (
-              <FontAwesome5 name="user-friends" size={20} color="green" />
+            tabBarIcon: ({ color }) => (
+              <FontAwesome5 name="user-friends" size={20} color={color} />
             ),
           }}
         />
@@ -105,8 +109,8 @@ export default function Main() {
           options={{
             tabBarLabel: "",
             tabBarShowLabel: false,
-            tabBarIcon: () => (
-              <Ionicons name="notifications" size={20} color="green" />
+            tabBarIcon: ({ color }) => (
+              <Ionicons name="notifications" size={20} color={color} />
             ),
           }}
         />
@@ -116,10 +120,13 @@ export default function Main() {
           options={{
             tabBarLabel: "",
             tabBarShowLabel: false,
-            tabBarIcon: () => <Ionicons name="menu" size={22} color="green" />,
+            tabBarIcon: ({ color }) => (
+              <Ionicons name="menu" size={22} color={color} />
+            ),
           }}
         />
       </Tab.Navigator>
     </Box>
   );
 }
+export default memo(Main);

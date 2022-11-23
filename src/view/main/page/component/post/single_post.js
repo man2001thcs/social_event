@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, memo } from "react";
 
 import {
   NativeBaseProvider,
@@ -14,6 +14,10 @@ import {
   VStack,
   Spacer,
   Icon,
+  PresenceTransition,
+  Menu,
+  Pressable,
+  HamburgerIcon,
 } from "native-base";
 
 import { View, Image, StyleSheet } from "react-native";
@@ -21,16 +25,26 @@ import { View, Image, StyleSheet } from "react-native";
 import { Dimensions } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
-import { MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { EvilIcons } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 
-import image_show from "./img_show";
+import Image_show from "./img_show";
 
-export default function SinglePost(props) {
+import Like_button from "./sub_component/like_button";
 
+import Comment_share from "./sub_component/comment_share";
+
+import Menu_button from "./sub_component/menu_button";
+
+const SinglePost = ({ id, author_name, post_body, comment_num, img_num }) => {
+  const navigation = useNavigation();
+  const [shouldOverlapWithTrigger] = React.useState(false);
+
+  const [isOpenLike, setIsOpenLike] = React.useState(false);
   return (
-    <Box my="2.5" px="1" pt="2" bgColor="white">
+    <Box my="2" px="1" pt="2" bgColor="white">
       <Flex direction="row" space={8} px="2" mt="2">
         <HStack>
           <Avatar
@@ -39,12 +53,12 @@ export default function SinglePost(props) {
               uri: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80",
             }}
           >
-            {props.author_name}
+            {author_name}
           </Avatar>
           <VStack ml="2" mt="0.5">
             <HStack>
               <Text bold fontSize="sm">
-                Dương Thùy Mị
+                {author_name}
               </Text>
             </HStack>
             <HStack>
@@ -55,37 +69,18 @@ export default function SinglePost(props) {
 
         <Spacer />
 
-        <IconButton
-          size="md"
-          mt="0"
-          variant="ghost"
-          alignSelf="flex-end"
-          _icon={{
-            as: MaterialIcons,
-            name: "menu",
-            color: "#137950",
-          }}
-        />
+        <Menu_button/>
+        
       </Flex>
 
       <Text mb="2" py="3" px="4" fontSize="18">
-        {props.post_body}
+        {post_body}
       </Text>
 
-      {image_show(props.img_num)}
+      <Image_show img_num={parseInt(img_num)} id={id} />
 
       <Flex direction="row-reverse" px="1" mt="1.5">
-        <Text
-          variant="ghost"
-          px="5"
-          mb="2"
-          fontSize="15"
-          _text={{
-            color: "coolGray.800",
-          }}
-        >
-          {props.comment_num} bình luận
-        </Text>
+        <Comment_share comment={5} share={10} />
       </Flex>
 
       <HStack mx="2.5" my="2">
@@ -100,19 +95,9 @@ export default function SinglePost(props) {
         />
       </HStack>
 
-      <HStack space={8} justifyContent="center" pb="2" px="2">
-        <Button
-          variant="ghost"
-          _text={{
-            color: "#137950",
-            fontSize: 15,
-          }}
-          endIcon={
-            <Icon as={EvilIcons} name="like" size="md" color="#137950" />
-          }
-        >
-          Like
-        </Button>
+      <HStack space={9} justifyContent="center" pb="2" px="2">
+        <Like_button />
+
         <Button
           variant="ghost"
           _text={{
@@ -122,6 +107,7 @@ export default function SinglePost(props) {
           endIcon={
             <Icon as={EvilIcons} name="comment" size="md" color="#137950" />
           }
+          onPress={() => navigation.navigate("Comment_page")}
         >
           Comment
         </Button>
@@ -140,4 +126,6 @@ export default function SinglePost(props) {
       </HStack>
     </Box>
   );
-}
+};
+
+export default memo(SinglePost);

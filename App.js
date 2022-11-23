@@ -11,6 +11,7 @@ import {
 import {
   createStackNavigator,
   TransitionPresets,
+  CardStyleInterpolators
 } from "@react-navigation/stack";
 
 import { Ionicons } from "@expo/vector-icons";
@@ -31,7 +32,7 @@ import Main from "./src/view/main/main";
 import Login from "./src/view/log/login";
 import SignIn from "./src/view/log/signin";
 import Create_post from "./src/view/main/page/component/post/create_post";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import Comment from "./src/view/main/page/component/post/comment";
 
 import link from "./src/config/const";
 import GenerateRandomCode from "react-random-code-generator";
@@ -45,15 +46,8 @@ export default function App() {
   const [email_login, setEmailLogin] = useState("");
   const [code_login, setCodeLogin] = useState("");
 
-
   console.log(code_login);
 
-  const childToParent = (data) => {
-    setCodeLogin(data);
-    console.log("aa");
-  };
-
-  /*
   useEffect(() => {
     if (code_login !== "") {
       const account_link =
@@ -80,26 +74,7 @@ export default function App() {
           console.error("Error:", error);
         });
     } else console.log("abc");
-  }, [code_login, email_login]);
-  */
-
-  console.log(code_login, email_login);
-
-  function getHeaderTitle(route) {
-    // If the focused route is not found, we need to assume it's the initial screen
-    // This can happen during if there hasn't been any navigation inside the screen
-    // In our case, it's "Feed" as that's the first screen inside the navigator
-    const routeName = getFocusedRouteNameFromRoute(route) ?? "Main";
-
-    switch (routeName) {
-      case "Main":
-        return "";
-      case "Home":
-        return "";
-      case "Create_post":
-        return "Create_post";
-    }
-  }
+  }, [logined]);
 
   const viewPage = () => {
     if (logined) {
@@ -112,15 +87,37 @@ export default function App() {
               options={{ headerShown: false }}
             />
             <Stack.Screen
-              name="Create_post"
+              name="Comment_page"
               children={() => (
-                <Create_post codeS={code_login} emailS={email_login}></Create_post>
+                <Comment codeS={code_login} emailS={email_login}></Comment>
               )}
               options={{
                 headerShown: false,
                 gestureEnabled: true,
                 cardOverlayEnabled: true,
+                cardShadowEnabled: true,          
                 ...TransitionPresets.ModalSlideFromBottomIOS,
+                cardStyleInterpolator:
+                  CardStyleInterpolators.forModalPresentationIOS,               
+              }}
+            />
+            <Stack.Screen
+              name="Create_post"
+              children={() => (
+                <Create_post
+                  codeS={code_login}
+                  emailS={email_login}
+                ></Create_post>
+              )}
+              options={{
+                headerShown: false,
+                gestureEnabled: true,
+                cardOverlayEnabled: true,
+                headerTransparent: true,
+                cardShadowEnabled: true,
+                ...TransitionPresets.ModalTransition,
+                cardStyleInterpolator:
+                  CardStyleInterpolators.forModalPresentationIOS,  
               }}
             />
           </Stack.Navigator>
@@ -133,7 +130,13 @@ export default function App() {
             <Stack.Screen
               name="Login"
               children={() => (
-                <Login codeS={code_login} setLogin={setLogin} codeChange={setCodeLogin} emailChange={setEmailLogin}></Login>
+                <Login
+                  codeS={code_login}
+                  setLogin={setLogin}
+                  codeChange={setCodeLogin}
+                  emailChange={setEmailLogin}
+                  logined={logined}
+                ></Login>
               )}
               options={{ headerShown: false }}
             />

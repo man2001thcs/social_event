@@ -114,7 +114,7 @@ function Home({ navigation }) {
       .catch((error) => {
         console.error("Error:", error);
       });
-      
+
     setShowNumber(5);
     setCantLoadMore(false);
     setRefresh(false);
@@ -181,6 +181,8 @@ function Home({ navigation }) {
 
   const memoizedValue = React.useMemo(() => renderItem, [showNumber]);
 
+  const memoizedNewPost = React.useMemo(() => NewPost, []);
+
   const LoadingScreen = () => {
     return (
       <HStack space={2} justifyContent="center" py="4" bgcolor="white">
@@ -202,7 +204,7 @@ function Home({ navigation }) {
           renderItem={memoizedValue}
           keyExtractor={(item) => item?.Post.id}
           ListHeaderComponent={() => {
-            return NewPost();
+            return memoizedNewPost();
           }}
           onEndReachedThreshold={0.5}
           ListFooterComponent={!cant_load_more && memoLoadingScreen()}
