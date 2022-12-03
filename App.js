@@ -1,9 +1,5 @@
-import { useState, useEffect } from "react";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { useState, useEffect, memo } from "react";
 
-import NativeBaseIcon from "./components/NativeBaseIcon";
-import { MaterialIcons } from "@expo/vector-icons";
-import { Platform } from "react-native";
 import {
   NavigationContainer,
   getFocusedRouteNameFromRoute,
@@ -11,94 +7,79 @@ import {
 import {
   createStackNavigator,
   TransitionPresets,
-  CardStyleInterpolators
+  CardStyleInterpolators,
 } from "@react-navigation/stack";
 
-import { Ionicons } from "@expo/vector-icons";
 import {
-  HStack,
-  Text,
+  forVerticalIOS,
+  forModalPresentationIOS,
+} from "@react-navigation/stack/lib/module/TransitionConfigs/CardStyleInterpolators";
+
+import { ModalSlideFromBottomIOS } from "@react-navigation/stack/lib/module/TransitionConfigs/TransitionPresets";
+
+import {
+
   NativeBaseProvider,
   Box,
-  Flex,
-  Button,
-  Icon,
-  Heading,
-  Spacer,
-  IconButton,
+
 } from "native-base";
 
 import Main from "./src/view/main/main";
 import Login from "./src/view/log/login";
 import SignIn from "./src/view/log/signin";
-import Create_post from "./src/view/main/page/component/post/create_post";
-import Comment from "./src/view/main/page/component/post/comment";
+import Create_post from "./src/view/main/page/component/post/create_post/create_post";
+import Comment from "./src/view/main/page/component/comment/comment_main";
 
 import link from "./src/config/const";
 import GenerateRandomCode from "react-random-code-generator";
 
-export default function App() {
+function App() {
   const [show, setShow] = useState(false);
   const [logined, setLogin] = useState(false);
   const [error, setError] = useState(null);
   const Stack = createStackNavigator();
 
+  const [info, setInfo] = useState("");
   const [email_login, setEmailLogin] = useState("");
   const [code_login, setCodeLogin] = useState("");
 
   console.log(code_login);
 
-  useEffect(() => {
-    if (code_login !== "") {
-      const account_link =
-        link.user_link +
-        code_login +
-        ".json" +
-        "?timeStamp=" +
-        GenerateRandomCode.TextCode(8);
-      console.log(account_link);
-      fetch(account_link, {
-        mode: "no-cors",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        credentials: "same-origin",
-      })
-        .then((res) => res.json())
-        .then((json) => {
-          console.log("Success:", json);
-          setLogin(true);
-        })
-        .catch((error) => {
-          console.error("Error:", error);
-        });
-    } else console.log("abc");
-  }, [logined]);
+  console.log(info);
 
   const viewPage = () => {
     if (logined) {
       return (
         <NavigationContainer>
-          <Stack.Navigator>
+          <Stack.Navigator screenOptions={{ cardStyle: { flex: 1 } }}>
             <Stack.Screen
               name="Main"
-              component={Main}
+              children={({ navigation }) => (
+                <Main
+                  codeS={code_login}
+                  emailS={email_login}
+                  navigation={navigation}
+                ></Main>
+              )}
               options={{ headerShown: false }}
             />
             <Stack.Screen
               name="Comment_page"
-              children={() => (
-                <Comment codeS={code_login} emailS={email_login}></Comment>
+              //component={Comment}
+              children={(props) => (
+                <Comment
+                  route_params={props.route.params}
+                  codeS={code_login}
+                  emailS={email_login}
+                ></Comment>
               )}
               options={{
+                gestureEnabled: false,
                 headerShown: false,
-                gestureEnabled: true,
                 cardOverlayEnabled: true,
-                cardShadowEnabled: true,          
-                ...TransitionPresets.ModalSlideFromBottomIOS,
-                cardStyleInterpolator:
-                  CardStyleInterpolators.forModalPresentationIOS,               
+                cardShadowEnabled: true,
+                ...ModalSlideFromBottomIOS,
+                cardStyleInterpolator: forModalPresentationIOS,
               }}
             />
             <Stack.Screen
@@ -116,8 +97,7 @@ export default function App() {
                 headerTransparent: true,
                 cardShadowEnabled: true,
                 ...TransitionPresets.ModalTransition,
-                cardStyleInterpolator:
-                  CardStyleInterpolators.forModalPresentationIOS,  
+                cardStyleInterpolator: forModalPresentationIOS,
               }}
             />
           </Stack.Navigator>
@@ -161,3 +141,5 @@ export default function App() {
     </NativeBaseProvider>
   );
 }
+
+export default memo(App);

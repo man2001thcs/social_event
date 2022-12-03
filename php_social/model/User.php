@@ -2,7 +2,7 @@
 require_once(dirname(__FILE__).DS. "../lib/AppModel.php");
 require_once(dirname(__FILE__).DS. "../lib/Helper.php");
 require_once(dirname(__FILE__).DS. "../lib/Session.php");
-require_once '../../model/Log_temp.php';
+
 date_default_timezone_set('Asia/Ho_Chi_Minh');
 
 class User extends AppModel {
@@ -207,6 +207,26 @@ class User extends AppModel {
 		$exists = $this->find(array(
 			'fields' => array($this->alias . '.id', $this->alias . '.fullname', $this->alias . '.address',
 			 $this->alias . '.phone_number', $this->alias . '.is_admin', $this->alias . '.created'),	
+			'conditions' => array(
+				'email' => $email			
+			)
+		), 'first');			
+		return $exists['User'];
+	}
+
+	public function get_id($email) {
+		$exists = $this->find(array(
+			'fields' => array($this->alias . '.id'),	
+			'conditions' => array(
+				'email' => $email			
+			)
+		), 'first');			
+		return $exists['User'];
+	}
+
+	public function get_full_name($email) {
+		$exists = $this->find(array(
+			'fields' => array($this->alias . '.fullname'),	
 			'conditions' => array(
 				'email' => $email			
 			)

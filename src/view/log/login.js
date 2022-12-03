@@ -2,13 +2,7 @@ import React, { memo, useState } from "react";
 
 import link from "../../config/const";
 
-import {
-  StyleSheet,
-  View,
-  Image,
-  TouchableOpacity,
-  ImageBackground,
-} from "react-native";
+import { Image, TouchableOpacity } from "react-native";
 
 import {
   Text,
@@ -16,19 +10,15 @@ import {
   Icon,
   Stack,
   Pressable,
-  Center,
   NativeBaseProvider,
   FormControl,
   WarningOutlineIcon,
   Box,
-  extendTheme,
   Button,
   Divider,
-  Heading,
   HStack,
+  useToast,
 } from "native-base";
-
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
@@ -38,7 +28,10 @@ import * as Yup from "yup";
 import GenerateRandomCode from "react-random-code-generator";
 import { Dimensions } from "react-native";
 
+import ToastAlert from "../main/page/component/alert";
+
 function Login({ codeChange, emailChange, setLogin, logined }) {
+  const toast = useToast();
   const navigation = useNavigation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -48,6 +41,8 @@ function Login({ codeChange, emailChange, setLogin, logined }) {
   const [isLoaded, setIsLoaded] = useState(false);
 
   const [show, setShow] = React.useState(false);
+
+  console.log(link.server_link);
 
   const SignupSchema = Yup.object().shape({
     emailS: Yup.string().email("Invalid email").required("Required email!"),
@@ -94,25 +89,47 @@ function Login({ codeChange, emailChange, setLogin, logined }) {
             )
               .then((res) => res.json())
               .then((data) => {
-                console.log("Success:", data);
+                //console.log("Success:", data);
                 if (data?.response.description === "success") {
-                  setLogin(true);
+                        
                   codeChange(values.codeS);
                   emailChange(values.emailS);
+                  setLogin(true);
                   actions.setSubmitting(false);
                 } else {
-                  alert("Đăng nhập thất bại, vui lòng thử lại sau");
+                  toast.show({
+                    render: ({ id }) => {
+                      return (
+                        <ToastAlert
+                          id={id}
+                          title="Đăng nhập thất bại"
+                          variant="solid"
+                          description="Vui lòng kiểm tra lại thông tin"
+                          isClosable={true}
+                        />
+                      );
+                    },
+                  });
                 }
               })
               .catch((error) => {
-                console.error("Error:", error);
+                console.log(error);
+                toast.show({
+                  render: ({ id }) => {
+                    return (
+                      <ToastAlert
+                        id={id}
+                        title="Đăng nhập thất bại"
+                        variant="solid"
+                        description={
+                          "Lỗi: " + error
+                        }
+                        isClosable={true}
+                      />
+                    );
+                  },
+                });
               });
-
-            setTimeout(() => {
-              if (!logined) {
-                actions.setSubmitting(false);
-              }
-            }, 5000);
 
             actions.resetForm({
               values: {
@@ -260,6 +277,7 @@ function Login({ codeChange, emailChange, setLogin, logined }) {
                   Sign up
                 </Button>
               </HStack>
+              <HStack px="4"></HStack>
             </Stack>
           )}
         </Formik>

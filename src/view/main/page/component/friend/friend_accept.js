@@ -1,25 +1,15 @@
-import React, { useState } from "react";
+import React from "react";
 
 import {
-  NativeBaseProvider,
   Text,
   Box,
   Button,
   HStack,
-  Divider,
-  Center,
   Avatar,
   Flex,
-  IconButton,
   VStack,
   Spacer,
-  Icon,
 } from "native-base";
-
-import { Ionicons } from "@expo/vector-icons";
-import { MaterialIcons } from "@expo/vector-icons";
-import { EvilIcons } from "@expo/vector-icons";
-import { FontAwesome } from "@expo/vector-icons";
 
 function FriendAccept(props) {
   return (
@@ -48,7 +38,7 @@ function FriendAccept(props) {
                 <Text>53 bạn chung</Text>
               </HStack>
             </VStack>
-            <Spacer w="5"/>
+            <Spacer w="5" />
             <VStack>
               <HStack>
                 <Text>1 năm</Text>

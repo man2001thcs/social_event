@@ -409,10 +409,54 @@ class MysqlDriver {
 				$math = '=';
 			}
 			
-			$conditionArray[] = " " . $field . " " . $math . " '" . $sub . "'";
+			if (strcmp($subVal[0], "LIKE") == 0) {
+				$conditionArray[] = " " . $field . " " . $sub . "";
+			} else {
+				$conditionArray[] = " " . $field . " " . $math . " '" . $sub . "'";
+			}
 		}
 		
 		return " WHERE " . implode(' AND ', $conditionArray);
+	}
+
+
+	protected function buildConditions_or($condition_or) {
+		if (empty($condition_or)) return;
+		
+		$sql = '';
+		$index = 0;
+		$conditionsArray = array();
+
+		//echo json_encode($condition_or);
+		//echo json_encode("\n");
+
+		foreach ( $condition_or as $conditions => $condition) {
+			//echo json_encode($sub);
+			if (empty($condition)) return;
+
+			$conditionArray = array();
+		
+			foreach ( $condition as $field => $sub ) {
+				$math = '';
+				$subVal = explode(' ', $sub);
+				if (!in_array($subVal[0], $this->keywords)) {
+					$math = '=';
+				}
+			
+				if (strcmp($subVal[0], "LIKE") == 0) {
+					$conditionArray[] = " " . $field . " " . $sub . "";
+				} else {
+					$conditionArray[] = " " . $field . " " . $math . " '" . $sub . "'";
+				}
+			
+			}
+		
+			$condition_single = " (" . implode(' AND ', $conditionArray) . ") ";
+
+			$conditionsArray[] = " " . $condition_single;
+		}
+		
+		return " WHERE " . implode(' OR ', $conditionsArray);
 	}
 	
 	/**
@@ -461,7 +505,7 @@ class MysqlDriver {
 		$sql = '';
 		if ($mainTable != "" && !empty( $joins )) {
 			foreach ( $joins as $k => $v ) {
-				$sql .= " " . (isset ( $v ['type'] ) ? $v ['type'] : "") . " JOIN " . $k . " ON " . $mainTable . "." . $v ['main_key'] . " = " . $k . "." . $v ['join_key'] . " ";
+				$sql .= " " . (isset ( $v ['type'] ) ? $v ['type'] : "") . " JOIN " . '(' . $v ['on_join'] . ') ' . "AS " . $v ['alias_sub'] . " ON " . $v ['alias_main'] . "." . $v ['main_key'] . " LIKE " . $v ['alias_sub']  . "." . $v ['join_key'] . " ";
 			}
 		}
 		return $sql;
@@ -549,7 +593,7 @@ class MysqlDriver {
 		
 		switch (strtolower ( $type )) {
 			case 'select' :
-				return "SELECT {$fields} FROM {$table} {$alias} {$joins} {$conditions} {$group} {$order} {$limit}";
+				return "SELECT {$fields} FROM {$table} {$alias} {$joins} {$conditions} {$conditions_or} {$group} {$order} {$limit}";
 				break;
 			case 'create' :
 				return "INSERT INTO {$table} ({$fields}) VALUES ({$values})";
@@ -648,6 +692,8 @@ class MysqlDriver {
 		$mJoins = isset($options['joins']) ? $options['joins'] : null;
 		$mlimit = isset($options['limit']) ? $options['limit'] : false;
 		$moffset = isset($options['offset']) ? $options['offset'] : false;
+
+		$conditions_or = isset($options['conditions_or']) ? $options['conditions_or'] : null;
 		
 		try {
 			$returnArr = array ();
@@ -669,9 +715,16 @@ class MysqlDriver {
 			}
 			
 			$conditions = $this->buildConditions ( $conditions );
+			$conditions_or = $this->buildConditions_or ( $conditions_or );
+
+			//echo json_encode($conditions_or);
+			//echo "<br/>";
+
 			$order = $this->buildOrders ( $orders );
 			$group = $this->buildGroups ( $groups );
 			$joins = $this->buildJoins ($myTable, $mJoins);
+
+			//echo json_encode($joins);
 			
 			$tmpTable = explode('_', $table);
 			$alias = array();
@@ -681,9 +734,12 @@ class MysqlDriver {
 			
 			$alias = implode($alias);
 			
-			$query = compact ( 'table', 'alias', 'joins', 'fields', 'conditions', 'joins', 'group', 'order', 'limit' );
+			$query = compact ( 'table', 'alias', 'joins', 'fields', 'conditions', 'conditions_or', 'joins', 'group', 'order', 'limit' );
 			$sql = $this->renderStatement ( 'select', $query );
 			$sql = $this->setLimit ( $sql, $mlimit, $moffset );
+
+			//echo json_encode($sql);
+			//echo "<br/>";
 			
 			if ($isCount) 
 				$returnArr = $this->fetchRow ( $sql );
@@ -695,6 +751,58 @@ class MysqlDriver {
 		
 		return $returnArr;
 	}
+
+	function select_sql($myTable, $options = array(), $isCount = false) {
+		// Get options by parameters
+		$myFields = isset($options['fields']) ? $options['fields'] : '*';
+		$conditions = isset($options['conditions']) ? $options['conditions'] : null;
+		$conditions_or = isset($options['conditions_or']) ? $options['conditions_or'] : null;
+		$orders = isset($options['orders']) ? $options['orders'] : null;
+		$groups = isset($options['groups']) ? $options['groups'] : null;
+		$mJoins = isset($options['joins']) ? $options['joins'] : null;
+		$mlimit = isset($options['limit']) ? $options['limit'] : false;
+		$moffset = isset($options['offset']) ? $options['offset'] : false;
+		
+		$returnArr = array ();
+		$table = $myTable;
+		$alias = $joins = $order = $group = $limit = "";
+		$fields = "";
+		if (is_array ( $myFields )) {
+			$fields = implode ( ', ', $myFields );
+		} else {
+			$fields = $myFields;
+		}
+			
+		if (isset ( $mJoins ) && is_array ( $mJoins )) {
+			foreach ( $mJoins as $jTable => $join ) {
+				if (empty ( $jTable ) || empty ( $join ['join_key'] ) || empty ( $join ['main_key'] ) || ! isset ( $join ['join_fields'] ) || !isset ( $join ['join_fields'] [1] ))
+					continue;
+				$fields .= ", " . $jTable . "." . $join ['join_fields'] [0] . ", " . $jTable . "." . $join ['join_fields'] [1];
+			}
+		}
+			
+		$conditions = $this->buildConditions ( $conditions );
+		$conditions_or = $this->buildConditions_or ( $conditions_or );
+		$order = $this->buildOrders ( $orders );
+		$group = $this->buildGroups ( $groups );
+		$joins = $this->buildJoins ($myTable, $mJoins);
+
+		//echo json_encode($joins);
+			
+		$tmpTable = explode('_', $table);
+		$alias = array();
+		foreach ($tmpTable as $tmp) {
+			$alias[] = ucfirst($tmp);
+		}
+			
+		$alias = implode($alias);
+			
+		$query = compact ( 'table', 'alias', 'joins', 'fields', 'conditions', 'conditions_or', 'joins', 'group', 'order', 'limit' );
+		$sql = $this->renderStatement ( 'select', $query );
+		$sql = $this->setLimit ( $sql, $mlimit, $moffset );
+
+		return $sql;
+	}	
 }
 
 

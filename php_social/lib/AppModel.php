@@ -99,6 +99,14 @@ class AppModel
 		return $results;
 	}
 
+	public function return_select_sql($conditions)
+	{
+		$results = $this->db->select_sql($this->table, $conditions);
+		//echo json_encode($conditions);
+
+		return $results;
+	}
+
 	//find thing by id
 	public function findById($id)
 	{
@@ -109,6 +117,15 @@ class AppModel
 		return $data;
 	}
 
+		
+	public function findByPostId($id)
+	{
+		$data = $this->find(array(
+			'conditions' => array($this->alias . '.post_id' => $id)
+		), 'first');
+		return $data;
+	}
+	
 	//new id for next item
 	public function findById_New()
 	{

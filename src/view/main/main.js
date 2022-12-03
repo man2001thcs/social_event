@@ -23,17 +23,13 @@ import {
 
 import { AntDesign, FontAwesome5 } from "@expo/vector-icons";
 
-import Login from "../../view/log/login";
-import BookList from "../../view/main/page/component/book/book_list";
-import Tutorial from "../../view/log/tutorial";
-
 import Home from "./page/home";
 import FriendList from "./page/friend";
 import NotifyList from "./page/notification";
 import Menu from "./page/menu";
 import { memo } from "react";
 
-function Main() {
+function Main({emailS, codeS}) {
   const [show, setShow] = React.useState(false);
 
   const Tab = createMaterialTopTabNavigator();
@@ -83,7 +79,9 @@ function Main() {
       >
         <Tab.Screen
           name="Home"
-          component={Home}
+          children={({navigation}) => (
+            <Home codeS={codeS} emailS={emailS} navigation={navigation}></Home>
+          )}
           options={{
             tabBarLabel: "Home",
             tabBarShowLabel: false,
@@ -94,7 +92,9 @@ function Main() {
         />
         <Tab.Screen
           name="Friendlist"
-          component={FriendList}
+          children={() => (
+            <FriendList codeS={codeS} emailS={emailS}></FriendList>
+          )}
           options={{
             tabBarLabel: "",
             tabBarShowLabel: false,
@@ -104,8 +104,10 @@ function Main() {
           }}
         />
         <Tab.Screen
-          name="Tutorial"
-          component={NotifyList}
+          name="NotifyList"
+          children={() => (
+            <NotifyList codeS={codeS} emailS={emailS}></NotifyList>
+          )}
           options={{
             tabBarLabel: "",
             tabBarShowLabel: false,
@@ -116,7 +118,9 @@ function Main() {
         />
         <Tab.Screen
           name="Menu"
-          component={Menu}
+          children={() => (
+            <Menu codeS={codeS} emailS={emailS}></Menu>
+          )}
           options={{
             tabBarLabel: "",
             tabBarShowLabel: false,

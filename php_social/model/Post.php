@@ -33,6 +33,15 @@ class Post extends AppModel {
 				"message" => MSG_ERR_NOTEMPTY
 			)
 		),
+		"publicity_state" => array(
+			"form" => array(
+				"type" => "text"
+			),
+			"isNumber" => array(
+				"rule" => "isNumber",
+				"message" => MSG_ERR_NUMER
+			)
+		),
 		"img_num" => array(
 			"form" => array(
 				"type" => "text"
@@ -43,6 +52,15 @@ class Post extends AppModel {
 			)
 		),
 		"like_num" => array(
+			"form" => array(
+				"type" => "text"
+			),
+			"isNumber" => array(
+				"rule" => "isNumber",
+				"message" => MSG_ERR_NUMER
+			)
+		),
+		"dislike_num" => array(
 			"form" => array(
 				"type" => "text"
 			),
@@ -69,7 +87,18 @@ class Post extends AppModel {
 				"message" => MSG_ERR_NUMER
 			)
 		),	
+		"comment_num" => array(
+			"form" => array(
+				"type" => "text"
+			),
+			"isNumber" => array(
+				"rule" => "isNumber",
+				"message" => MSG_ERR_NUMER
+			)
+		),
 	);
+
+	//Publicity_state: 0 là private, 1 là friend_only, 2 là public
 	
 	public function __construct() {
 
@@ -90,5 +119,52 @@ class Post extends AppModel {
 		//echo json_encode($results);
 
 		return $results;
+	}
+
+	public function get_post($account, $limit = 0)
+	{
+
+		$friend_relation = new Friend_relation();
+
+		$data_sql = $friend_relation->return_select_sql(array(
+			'conditions' => array(
+				"user_account_1" => "LIKE " . "'" . $account. "'", 
+				
+				)
+		));
+
+		$mlimit = $limit + 5;
+	
+		$data = $this->find(array(
+			'joins' => array('friend_relation' => array(
+				'type' => "LEFT",
+				'on_join' => $data_sql,
+				'main_key' =>  'user_account',
+				'join_key' =>  'user_account_2',
+				'alias_main' =>  'Post',
+				'alias_sub' =>  'Friend_relation1',
+			)),
+			'conditions_or' => array(
+				'condition1' => array('POST.publicity_state' => 1,
+				"Friend_relation1.user_account_1" => "LIKE " . "'" . $account . "'", 
+					),
+				'condition2' => array('POST.publicity_state' => 2),
+			),
+			'orders' => $this->alias . '.modified' . ' DESC',
+			'limit' => $mlimit
+		), 'all');
+
+		return $data;
+	}
+
+	public function number_all()
+	{
+		$data = $this->find(array(
+			'fields' => array($this->alias . '.id')
+		), 'all');
+
+		$size = sizeof($data);
+		$this->_total = $size;
+		return $size;
 	}
 }
