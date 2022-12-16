@@ -8,10 +8,24 @@ import Time_show from "../time_function/time_show";
 import link from "../../../../../../config/const";
 
 //single comment format
-function Single_Comment({ post_id, user_id, user_name, comment_body, created, modified }) {
+function Single_Comment({
+  id,
+  post_id,
+  user_id,
+  user_name,
+  comment_body,
+  created,
+  modified,
+  emailS,
+  codeS,
+  like_num,
+  dislike_num,
+  love_num,
+  hate_num,
+}) {
   const dimensions = Dimensions.get("window");
 
-  //the time that past by minute, since created, 
+  //the time that past by minute, since created,
   //divine by 5 so the comment can be updated for each 5 minute (if the variable is less than an hour)
   const time_distance_5 = Math.round(
     (new Date().valueOf() - new Date(created.replace(/-/g, "/")).valueOf()) /
@@ -26,7 +40,7 @@ function Single_Comment({ post_id, user_id, user_name, comment_body, created, mo
   );
 
   const author_avatar_link =
-  link.user_image_link + user_id + "/avatar/avatar_this.png";
+    link.user_image_link + user_id + "/avatar/avatar_this.png";
   return (
     <Box ml="4" my="1.5" flex="1">
       <HStack>
@@ -69,7 +83,15 @@ function Single_Comment({ post_id, user_id, user_name, comment_body, created, mo
                 time_modified={time_modified}
               />
 
-              <Comment_like_button />
+              <Comment_like_button
+                id={id}
+                emailS={emailS}
+                codeS={codeS}
+                like_num={like_num}
+                dislike_num={dislike_num}
+                love_num={love_num}
+                hate_num={hate_num}
+              />
 
               <Button
                 variant="ghost"

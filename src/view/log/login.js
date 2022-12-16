@@ -30,15 +30,9 @@ import { Dimensions } from "react-native";
 
 import ToastAlert from "../main/page/component/alert";
 
-function Login({ codeChange, emailChange, setLogin, logined }) {
+function Login({ codeChange, emailChange, setLogin, logined, setInfo }) {
   const toast = useToast();
   const navigation = useNavigation();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [result, setResult] = useState("");
-
-  const [error, setError] = useState(null);
-  const [isLoaded, setIsLoaded] = useState(false);
 
   const [show, setShow] = React.useState(false);
 
@@ -56,7 +50,7 @@ function Login({ codeChange, emailChange, setLogin, logined }) {
 
   return (
     <NativeBaseProvider>
-      <Box bgColor="white" py="4" h="100%">
+      <Box bgColor="white" py="4" h="100%" safeAreaTop>
         <Box alignSelf="center">
           <Image
             source={require("../../img/log/background.jpg")}
@@ -76,6 +70,7 @@ function Login({ codeChange, emailChange, setLogin, logined }) {
             codeS: GenerateRandomCode.TextCode(8),
           }}
           onSubmit={async (values, actions) => {
+            console.log("login");
             await fetch(
               link.server_link +
                 "controller/user/login.php?TimeStamp=" +
@@ -87,14 +82,32 @@ function Login({ codeChange, emailChange, setLogin, logined }) {
                 body: JSON.stringify(values),
               }
             )
-              .then((res) => res.json())
+              .then((res) => {
+                if (res.ok) return res.json();
+                else {
+                  toast.show({
+                    render: ({ id }) => {
+                      return (
+                        <ToastAlert
+                          id={id}
+                          title="Đăng nhập thất bại"
+                          variant="solid"
+                          description="Lỗi mạng, vui lòng thử lại."
+                          isClosable={true}
+                        />
+                      );
+                    },
+                  });
+                  actions.setSubmitting(false);
+                }
+              })
               .then((data) => {
                 //console.log("Success:", data);
-                if (data?.response.description === "success") {
-                        
+                if (data?.code === "ACCOUNT_LOGIN_OK") {
                   codeChange(values.codeS);
                   emailChange(values.emailS);
                   setLogin(true);
+                  setInfo(JSON.parse(data?.data));
                   actions.setSubmitting(false);
                 } else {
                   toast.show({
@@ -121,9 +134,7 @@ function Login({ codeChange, emailChange, setLogin, logined }) {
                         id={id}
                         title="Đăng nhập thất bại"
                         variant="solid"
-                        description={
-                          "Lỗi: " + error
-                        }
+                        description={"Lỗi: " + error}
                         isClosable={true}
                       />
                     );
@@ -141,6 +152,7 @@ function Login({ codeChange, emailChange, setLogin, logined }) {
 
               // you can also set the other form states here
             });
+            actions.setSubmitting(false);
           }}
         >
           {({

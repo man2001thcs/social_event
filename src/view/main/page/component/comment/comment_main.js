@@ -64,12 +64,12 @@ function Comment({ emailS, codeS, route_params }) {
       .then((data) => {
         console.log("Success", data);
 
-        if (parseInt(data?.response.id) !== 1) {
+        if (parseInt(data?.id) !== 1) {
           setCantLoadMore(true);
           setLoadMore(false);
-        } else if (parseInt(data?.response.id) === 1) {
+        } else if (parseInt(data?.id) === 1) {
           setShowNumber(showNumber + 5);
-          let response_data = JSON.parse(data?.response.data);
+          let response_data = JSON.parse(data?.data);
           console.log(response_data);
           setCommentList(response_data);
         }
@@ -79,6 +79,44 @@ function Comment({ emailS, codeS, route_params }) {
       });
 
     setLoadMore(false);
+  };
+
+  const refreshData = async () => {
+    const getComment_link =
+      link.commment_link + "?timeStamp=" + GenerateRandomCode.TextCode(8);
+
+    var values = { limit: 5, emailS: emailS, codeS: codeS, getMore: 0 };
+
+    await fetch(getComment_link, {
+      mode: "no-cors",
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify(values),
+      credentials: "same-origin",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        //console.log("Success:", data);
+
+        if (parseInt(data?.id) === 0) {
+          setCantLoadMore(true);
+        } else if (parseInt(data?.id) === 1) {
+          let response_data = JSON.parse(data?.data);
+          console.log(response_data);
+          setCommentList(response_data);
+        }
+      })
+      .catch((error) => {
+        //console.error("Error:", error);
+      });
+
+    setShowNumber(5);
+    setCantLoadMore(false);
+    setLoadMore(false);
+    setRefresh(false);
   };
 
   //fetch data for first time only since render
@@ -211,7 +249,7 @@ function Comment({ emailS, codeS, route_params }) {
           style={{ flex: 1, height: dimensions.height * 0.77 }}
           data={memoizedList}
           renderItem={memoizedValue}
-          keyExtractor={(item) => item?.Comment.id}
+          keyExtractor={(item) => item.Comment.id}
           onEndReachedThreshold={0.5}
           ListFooterComponent={!cant_load_more && memoLoadingScreen()}
           ListEmptyComponent={cant_load_more && memoEmptyScreen}
@@ -238,6 +276,7 @@ function Comment({ emailS, codeS, route_params }) {
           emailS={emailS}
           codeS={codeS}
           post_id={route_params.id}
+          refreshData={refreshData}
         />
       </HStack>
     </Box>

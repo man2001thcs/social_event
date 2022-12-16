@@ -1,35 +1,30 @@
 import React, { useState } from "react";
-import {
-  Popover,
-  Stagger,
-  IconButton,
-  Icon,
-  HStack,
-} from "native-base";
-import {
-  MaterialCommunityIcons,
-  AntDesign,
-} from "@expo/vector-icons";
+import { Popover, Stagger, IconButton, Icon, HStack } from "native-base";
+import { MaterialCommunityIcons, AntDesign } from "@expo/vector-icons";
 import GenerateRandomCode from "react-random-code-generator";
 
 import link from "../../../../../../config/const";
 import Emotion_button from "./emotion_button";
-
 
 function Like_button({
   id,
   author_id,
   emailS,
   codeS,
+  like_num,
+  dislike_num,
+  love_num,
+  hate_num,
 }) {
   const [emotionState, setEmotionState] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
+  console.log(emailS);
 
-  //on going :((, pls wait
-  /*
   React.useEffect(() => {
     fetch(
-      link.emotion_list_link + "?timeStamp=" + GenerateRandomCode.TextCode(8),
+      link.emotion_com_list_link +
+        "?timeStamp=" +
+        GenerateRandomCode.TextCode(8),
       {
         mode: "no-cors",
         method: "POST",
@@ -61,11 +56,12 @@ function Like_button({
         console.error("Error:", error);
       });
   }, [like_num, dislike_num, love_num, hate_num]);
-  */
 
   const sendEmotion = async (emoState, cancel) => {
     const getPost_link =
-      link.emotion_send_link + "?timeStamp=" + GenerateRandomCode.TextCode(8);
+      link.emotion_com_send_link +
+      "?timeStamp=" +
+      GenerateRandomCode.TextCode(8);
 
     await fetch(getPost_link, {
       mode: "no-cors",
@@ -75,7 +71,7 @@ function Like_button({
         Accept: "application/json",
       },
       body: JSON.stringify({
-        id: id,
+        comment_id: id,
         author_id: author_id,
         emotionState: emoState,
         oldEmotionState: emotionState,
@@ -102,7 +98,6 @@ function Like_button({
       }
     }
   };
-  
 
   return (
     <Popover // @ts-ignore

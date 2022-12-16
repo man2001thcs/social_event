@@ -35,8 +35,6 @@ import { EvilIcons } from "@expo/vector-icons";
 import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
 import { CheckIcon } from "@expo/vector-icons";
 
-import AsyncStorage from "@react-native-async-storage/async-storage";
-
 import { MaterialIcons } from "@expo/vector-icons";
 
 import { Formik, Form, Field, ErrorMessage, useFormik } from "formik";

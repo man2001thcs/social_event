@@ -29,12 +29,13 @@ import NotifyList from "./page/notification";
 import Menu from "./page/menu";
 import { memo } from "react";
 
-function Main({emailS, codeS}) {
+function Main({ emailS, codeS, this_user_id }) {
   const [show, setShow] = React.useState(false);
 
   const Tab = createMaterialTopTabNavigator();
   return (
-    <Box flex="1" pt="2" bgColor="white">
+    <Box flex="1" pt="2" bgColor="white" safeAreaTop>
+      <StatusBar barStyle="dark-content" backgroundColor="white" />
       <Flex direction="row" space={8} mr="3" bgColor="white">
         <Heading size="md" color="#137950" fontWeight="bold" ml="4" mt="1">
           Social
@@ -79,8 +80,13 @@ function Main({emailS, codeS}) {
       >
         <Tab.Screen
           name="Home"
-          children={({navigation}) => (
-            <Home codeS={codeS} emailS={emailS} navigation={navigation}></Home>
+          children={({ navigation }) => (
+            <Home
+              this_user_id={this_user_id}
+              codeS={codeS}
+              emailS={emailS}
+              navigation={navigation}
+            ></Home>
           )}
           options={{
             tabBarLabel: "Home",
@@ -92,8 +98,13 @@ function Main({emailS, codeS}) {
         />
         <Tab.Screen
           name="Friendlist"
-          children={() => (
-            <FriendList codeS={codeS} emailS={emailS}></FriendList>
+          children={({ navigation }) => (
+            <FriendList
+              this_user_id={this_user_id}
+              codeS={codeS}
+              emailS={emailS}
+              navigation={navigation}
+            ></FriendList>
           )}
           options={{
             tabBarLabel: "",
@@ -118,9 +129,7 @@ function Main({emailS, codeS}) {
         />
         <Tab.Screen
           name="Menu"
-          children={() => (
-            <Menu codeS={codeS} emailS={emailS}></Menu>
-          )}
+          children={() => <Menu codeS={codeS} emailS={emailS}></Menu>}
           options={{
             tabBarLabel: "",
             tabBarShowLabel: false,

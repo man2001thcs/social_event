@@ -1,26 +1,26 @@
 import React from "react";
 import { FlatList } from "react-native";
 import { HStack, Box, Heading, Spinner } from "native-base";
-
-import FriendAccept from "./component/friend/friend_accept";
-import Friend_bar from "./component/friend/friend_bar";
-import link from "../../../config/const";
-import FriendSuggestList from "./component/friend/friend_suggest";
 import GenerateRandomCode from "react-random-code-generator";
 import { useNavigation } from "@react-navigation/native";
 
-export default function FriendList({ emailS, codeS, this_user_id }) {
+import SinglePost from "./component/post/single_post/single_post";
+import Home_badge from "./component/post/personal_home_toolbar/home_badge";
+import link from "../../../config/const";
+
+function PersonalHome({ emailS, codeS, info, this_user_id }) {
   const [showNumber, setShowNumber] = React.useState(0);
   const [refresh_now, setRefresh] = React.useState(false);
   const [load_more, setLoadMore] = React.useState(false);
   const [cant_load_more, setCantLoadMore] = React.useState(false);
-  const [friend_list, setFriendRequestList] = React.useState([]);
+  const [post_list, setPostList] = React.useState([]);
   const navigation = useNavigation();
 
   const fetchData = async () => {
-    const getFriendRequest_link =
-      link.friend_request_link + "?timeStamp=" + GenerateRandomCode.TextCode(8);
-    await fetch(getFriendRequest_link, {
+    const getPost_link =
+      link.post_personal_link + "?timeStamp=" + GenerateRandomCode.TextCode(8);
+
+    await fetch(getPost_link, {
       mode: "no-cors",
       method: "POST",
       headers: {
@@ -31,6 +31,7 @@ export default function FriendList({ emailS, codeS, this_user_id }) {
         limit: showNumber,
         emailS: emailS,
         codeS: codeS,
+        user_id: this_user_id,
         getMore: 1,
       }),
       credentials: "same-origin",
@@ -42,28 +43,27 @@ export default function FriendList({ emailS, codeS, this_user_id }) {
           setCantLoadMore(true);
           setLoadMore(false);
         } else if (parseInt(data?.id) === 1) {
-          setShowNumber(showNumber + 10);
+          setShowNumber(showNumber + 5);
           let response_data = JSON.parse(data?.data);
           console.log(response_data);
-          setFriendRequestList(response_data);
+          setPostList(response_data);
         }
       })
       .catch((error) => {
-        //console.error("Error:", error);
+        console.error("Error:", error);
       });
 
     setLoadMore(false);
   };
-
-  //console.log(friend_list);
+  console.log(post_list);
 
   const refreshData = async () => {
-    const getFriendRequest_link =
-      link.friend_link + "?timeStamp=" + GenerateRandomCode.TextCode(8);
+    const getPost_link =
+      link.post_link + "?timeStamp=" + GenerateRandomCode.TextCode(8);
 
-    var values = { limit: 10, emailS: emailS, codeS: codeS, getMore: 0 };
+    var values = { limit: 5, emailS: emailS, codeS: codeS, getMore: 0 };
 
-    await fetch(getFriendRequest_link, {
+    await fetch(getPost_link, {
       mode: "no-cors",
       method: "POST",
       headers: {
@@ -75,17 +75,21 @@ export default function FriendList({ emailS, codeS, this_user_id }) {
     })
       .then((res) => res.json())
       .then((data) => {
-        //console.log("Success:", data);
-        let response_data = JSON.parse(data?.data);
-        console.log(response_data);
-        if (response_data?.data === "null") response_data = [];
-        setFriendRequestList(response_data);
+        console.log("Success:", data);
+
+        if (parseInt(data?.id) === 0) {
+          setCantLoadMore(true);
+        } else if (parseInt(data?.id) === 1) {
+          let response_data = JSON.parse(data?.data);
+          //console.log(response_data);
+          setPostList(response_data);
+        }
       })
       .catch((error) => {
-        //console.error("Error:", error);
+        console.error("Error:", error);
       });
 
-    setShowNumber(10);
+    setShowNumber(5);
     setCantLoadMore(false);
     setLoadMore(false);
     setRefresh(false);
@@ -97,25 +101,33 @@ export default function FriendList({ emailS, codeS, this_user_id }) {
 
   const renderItem = ({ item }) => {
     return (
-      <FriendAccept
-        id={item?.FriendRelation.id}
-        user_id_2={item?.FriendRelation.user_id}
-        user_account_2={item?.FriendRelation.user_account_2}
-        user_name_2={item?.User.fullname}
-        created={item?.FriendRelation.created}
-        modified={item?.FriendRelation.modified}
+      <SinglePost
+        id={item?.Post.id}
+        author_id={item?.Post.user_id}
+        author_account={item?.Post.user_account}
+        author_name={item?.Post.user_name}
+        post_body={item?.Post.post_body}
+        img_num={item?.Post.img_num}
+        like_num={item?.Post.like_num}
+        dislike_num={item?.Post.dislike_num}
+        love_num={item?.Post.love_num}
+        hate_num={item?.Post.hate_num}
+        created={item?.Post.created}
+        modified={item?.Post.modified}
+        comment_num={item?.Post.comment_num}
         emailS={emailS}
         codeS={codeS}
         navigation={navigation}
         user_id={this_user_id}
-        refreshData={refreshData}
+        publicity_state={item?.Post.publicity_state}
+        fullView={false}
       />
     );
   };
 
   const memoizedList = React.useMemo(() => {
-    return friend_list;
-  }, [friend_list]);
+    return post_list;
+  }, [post_list]);
 
   const memoizedValue = React.useMemo(
     () => renderItem,
@@ -125,7 +137,7 @@ export default function FriendList({ emailS, codeS, this_user_id }) {
   const LoadingScreen = () => {
     return (
       <HStack space={2} justifyContent="center" py="4" bgcolor="white">
-        <Spinner accessibilityLabel="Loading friends" color="green.600" />
+        <Spinner accessibilityLabel="Loading posts" color="green.600" />
         <Heading color="green.500" fontSize="md">
           Loading
         </Heading>
@@ -136,31 +148,25 @@ export default function FriendList({ emailS, codeS, this_user_id }) {
   const EmptyScreen = () => {
     return (
       <HStack space={2} justifyContent="center" py="4" bgcolor="white">
+        <Spinner accessibilityLabel="Loading posts" color="green.600" />
         <Heading color="green.500" fontSize="md">
-          Không có lời mời kết bạn nào
+          Trống, vui lòng reload lại
         </Heading>
       </HStack>
     );
   };
 
-  const memoLoadingScreen = React.useMemo(() => LoadingScreen, [friend_list]);
-  const memoEmptyScreen = React.useMemo(() => EmptyScreen, [friend_list]);
-
+  const memoLoadingScreen = React.useMemo(() => LoadingScreen, [post_list]);
+  const memoEmptyScreen = React.useMemo(() => EmptyScreen, [post_list]);
   return (
-    <Box flex="1" mt="0" bgColor="white">
+    <Box flex="1" mt="0">
       <HStack>
         <FlatList
           data={memoizedList}
           renderItem={memoizedValue}
-          keyExtractor={(item) => item?.FriendRelation.id}
+          keyExtractor={(item) => item?.Post.id}
           ListHeaderComponent={() => {
-            return (
-              <Friend_bar
-                this_user_id={this_user_id}
-                emailS={emailS}
-                codeS={codeS}
-              />
-            );
+            return <Home_badge emailS={emailS} codeS={codeS} info={info} />;
           }}
           onEndReachedThreshold={0.5}
           ListFooterComponent={!cant_load_more && memoLoadingScreen()}
@@ -178,12 +184,8 @@ export default function FriendList({ emailS, codeS, this_user_id }) {
           }}
         />
       </HStack>
-      <FriendSuggestList
-        emailS={emailS}
-        codeS={codeS}
-        navigation={navigation}
-        user_id={this_user_id}
-      />
     </Box>
   );
 }
+
+export default React.memo(PersonalHome);

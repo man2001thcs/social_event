@@ -1,15 +1,13 @@
 import React from "react";
 import { FlatList } from "react-native";
-import { HStack, Box, Heading, Spinner } from "native-base";
+import { HStack, Box, Heading, Spinner, Divider } from "native-base";
 
-import FriendAccept from "./component/friend/friend_accept";
-import Friend_bar from "./component/friend/friend_bar";
-import link from "../../../config/const";
-import FriendSuggestList from "./component/friend/friend_suggest";
+import FriendSuggestSingle from "./friend_suggest_single";
+import link from "../../../../../config/const";
 import GenerateRandomCode from "react-random-code-generator";
 import { useNavigation } from "@react-navigation/native";
 
-export default function FriendList({ emailS, codeS, this_user_id }) {
+export default function FriendSuggestList({ emailS, codeS, this_user_id }) {
   const [showNumber, setShowNumber] = React.useState(0);
   const [refresh_now, setRefresh] = React.useState(false);
   const [load_more, setLoadMore] = React.useState(false);
@@ -19,7 +17,7 @@ export default function FriendList({ emailS, codeS, this_user_id }) {
 
   const fetchData = async () => {
     const getFriendRequest_link =
-      link.friend_request_link + "?timeStamp=" + GenerateRandomCode.TextCode(8);
+      link.friend_suggest_link + "?timeStamp=" + GenerateRandomCode.TextCode(8);
     await fetch(getFriendRequest_link, {
       mode: "no-cors",
       method: "POST",
@@ -97,7 +95,7 @@ export default function FriendList({ emailS, codeS, this_user_id }) {
 
   const renderItem = ({ item }) => {
     return (
-      <FriendAccept
+      <FriendSuggestSingle
         id={item?.FriendRelation.id}
         user_id_2={item?.FriendRelation.user_id}
         user_account_2={item?.FriendRelation.user_account_2}
@@ -137,7 +135,7 @@ export default function FriendList({ emailS, codeS, this_user_id }) {
     return (
       <HStack space={2} justifyContent="center" py="4" bgcolor="white">
         <Heading color="green.500" fontSize="md">
-          Không có lời mời kết bạn nào
+          Hiện tại chưa có gợi ý nào
         </Heading>
       </HStack>
     );
@@ -147,42 +145,37 @@ export default function FriendList({ emailS, codeS, this_user_id }) {
   const memoEmptyScreen = React.useMemo(() => EmptyScreen, [friend_list]);
 
   return (
-    <Box flex="1" mt="0" bgColor="white">
-      <HStack>
-        <FlatList
-          data={memoizedList}
-          renderItem={memoizedValue}
-          keyExtractor={(item) => item?.FriendRelation.id}
-          ListHeaderComponent={() => {
-            return (
-              <Friend_bar
-                this_user_id={this_user_id}
-                emailS={emailS}
-                codeS={codeS}
-              />
-            );
+    <Box flex="1">
+      <Divider
+          thickness="2"
+          _light={{
+            bg: "muted.400",
           }}
-          onEndReachedThreshold={0.5}
-          ListFooterComponent={!cant_load_more && memoLoadingScreen()}
-          ListEmptyComponent={cant_load_more && memoEmptyScreen}
-          onEndReached={() => {
-            if (!cant_load_more) {
-              setLoadMore(true);
-              fetchData();
-            }
-          }}
-          refreshing={refresh_now}
-          onRefresh={() => {
-            setRefresh(true);
-            refreshData();
+          _dark={{
+            bg: "muted.50",
           }}
         />
-      </HStack>
-      <FriendSuggestList
-        emailS={emailS}
-        codeS={codeS}
-        navigation={navigation}
-        user_id={this_user_id}
+      <Heading size="md" color="black" fontWeight="bold" ml="4" my="2.5">
+        Gợi ý
+      </Heading>
+      <FlatList
+        data={memoizedList}
+        renderItem={memoizedValue}
+        keyExtractor={(item) => item?.User.id}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={!cant_load_more && memoLoadingScreen()}
+        ListEmptyComponent={cant_load_more && memoEmptyScreen}
+        onEndReached={() => {
+          if (!cant_load_more) {
+            setLoadMore(true);
+            fetchData();
+          }
+        }}
+        refreshing={refresh_now}
+        onRefresh={() => {
+          setRefresh(true);
+          refreshData();
+        }}
       />
     </Box>
   );

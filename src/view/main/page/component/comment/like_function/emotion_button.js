@@ -15,6 +15,7 @@ function Emotion_buttton({
         _text={{
           color: "#137950",
           fontSize: 15,
+          fontWeight: 'bold',
         }}
         onLongPress={() => setIsOpen(true)}
         {...triggerProps}
@@ -30,8 +31,9 @@ function Emotion_buttton({
       <Button
         variant="ghost"
         _text={{
-          color: "#137950",
+          color: "blue.500",
           fontSize: 15,
+          fontWeight: 'bold',
         }}
         onLongPress={() => setIsOpen(true)}
         {...triggerProps}
@@ -39,7 +41,7 @@ function Emotion_buttton({
           sendEmotion(2, true);
         }}
       >
-        DisLike
+        Không thích
       </Button>
     );
   } else if (emotionState === 3) {
@@ -47,8 +49,9 @@ function Emotion_buttton({
       <Button
         variant="ghost"
         _text={{
-          color: "#137950",
+          color: "red.500",
           fontSize: 15,
+          fontWeight: 'bold',
         }}
         onLongPress={() => setIsOpen(true)}
         {...triggerProps}
@@ -56,7 +59,7 @@ function Emotion_buttton({
           sendEmotion(3, true);
         }}
       >
-        Love
+        Yêu thích
       </Button>
     );
   } else if (emotionState === 4) {
@@ -64,8 +67,9 @@ function Emotion_buttton({
       <Button
         variant="ghost"
         _text={{
-          color: "#137950",
+          color: "orange.500",
           fontSize: 15,
+          fontWeight: 'bold',
         }}       
         onLongPress={() => setIsOpen(true)}
         {...triggerProps}

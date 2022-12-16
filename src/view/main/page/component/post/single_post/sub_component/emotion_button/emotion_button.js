@@ -34,11 +34,11 @@ function Emotion_buttton({
       <Button
         variant="ghost"
         _text={{
-          color: "#137950",
+          color: "blue.500",
           fontSize: 15,
         }}
         endIcon={
-          <Icon as={AntDesign} name="dislike1" size="md" color="#137950" />
+          <Icon as={AntDesign} name="dislike1" size="md" color="blue.500" />
         }
         onLongPress={() => setIsOpen(true)}
         {...triggerProps}
@@ -54,10 +54,10 @@ function Emotion_buttton({
       <Button
         variant="ghost"
         _text={{
-          color: "#137950",
+          color: "red.500",
           fontSize: 15,
         }}
-        endIcon={<Icon as={AntDesign} name="heart" size="md" color="#137950" />}
+        endIcon={<Icon as={AntDesign} name="heart" size="md" color="red.500" />}
         onLongPress={() => setIsOpen(true)}
         {...triggerProps}
         onPress={() => {
@@ -72,7 +72,7 @@ function Emotion_buttton({
       <Button
         variant="ghost"
         _text={{
-          color: "#137950",
+          color: "orange.500",
           fontSize: 15,
         }}
         endIcon={
@@ -80,7 +80,7 @@ function Emotion_buttton({
             as={MaterialCommunityIcons}
             name="heart-broken"
             size="md"
-            color="#137950"
+            color="orange.500"
           />
         }
         onLongPress={() => setIsOpen(true)}

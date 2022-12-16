@@ -1,36 +1,25 @@
 import React from "react";
 
-import { MaterialIcons } from "@expo/vector-icons";
-import { Platform } from "react-native";
-import { NavigationContainer } from "@react-navigation/native";
-import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-
 import { Ionicons } from "@expo/vector-icons";
 import {
   HStack,
-  Text,
-  NativeBaseProvider,
   Box,
-  Flex,
   Button,
   Icon,
   Heading,
   Spacer,
   IconButton,
-  Avatar,
-  Center,
   ScrollView,
   VStack,
   Divider,
 } from "native-base";
+import { useNavigation } from "@react-navigation/native";
 
-import { AntDesign, FontAwesome5, EvilIcons } from "@expo/vector-icons";
-
-import NotifySingle from "./component/notification/notify_single";
+import { AntDesign, FontAwesome5 } from "@expo/vector-icons";
 
 export default function Menu() {
   const [show, setShow] = React.useState(false);
-
+  const navigation = useNavigation();
   function FriendBar() {
     return (
       <VStack my="3">
@@ -87,7 +76,61 @@ export default function Menu() {
   return (
     <Box flex="1" mt="0" bgColor="white">
       <ScrollView>
-        {FriendBar()}
+        {FriendBar()}    
+        <HStack space={4} justifyContent="flex-start" pb="1" px="3">
+          <Button
+            variant="ghost"
+            h="10"
+            startIcon={
+              <Icon
+                as={FontAwesome5}
+                name="user-friends"
+                size="md"
+                color="#137950"
+              />
+            }
+            _text={{
+              color: "#137950",
+              fontSize: 15,
+            }}
+            onPress={() => navigation.navigate("Personal_home")}
+          >
+            Trang cá nhân
+          </Button>
+        </HStack>
+        <HStack space={4} justifyContent="flex-start" pb="1" px="3">
+          <Divider
+            my="2"
+            thickness="1"
+            _light={{
+              bg: "muted.400",
+            }}
+            _dark={{
+              bg: "muted.50",
+            }}
+          />
+        </HStack>
+        <HStack space={4} justifyContent="flex-start" pb="1" px="3">
+          <Button
+            variant="ghost"
+            h="10"
+            startIcon={
+              <Icon
+                as={FontAwesome5}
+                name="user-friends"
+                size="md"
+                color="#137950"
+              />
+            }
+            _text={{
+              color: "#137950",
+              fontSize: 15,
+            }}
+            onPress={() => navigation.navigate("Test")}
+          >
+            Test
+          </Button>
+        </HStack>
         <HStack space={4} justifyContent="flex-start" pb="1" px="3">
           <Divider
             my="2"
@@ -170,7 +213,7 @@ export default function Menu() {
             h="10"
             w="100%"
             size="lg"
-            bgColor= "#137950"
+            bgColor="#137950"
             _text={{
               fontWeight: "bold",
             }}

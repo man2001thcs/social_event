@@ -14,28 +14,16 @@ import {
 import GenerateRandomCode from "react-random-code-generator";
 
 import link from "../../../../../config/const";
-import Time_show from "./time_function/time_show";
 import ToastAlert from "../alert";
 
-function FriendAccept(props) {
+function FriendSuggest(props) {
   const toast = useToast();
-  const time_distance_5 = Math.round(
-    (new Date().valueOf() -
-      new Date(props.created.replace(/-/g, "/")).valueOf()) /
-      300000
-  );
 
-  const time_modified = Math.round(
-    (new Date(props.modified.replace(/-/g, "/")).valueOf() -
-      new Date(props.created.replace(/-/g, "/")).valueOf()) /
-      60000
-  );
-
-  const accept_declineFunction = (command) => {
+  const sendFunction = (command) => {
     let command_line = (command === 1) ? "Kết bạn" : "Hủy kết bạn";
     fetch(
       link.server_link +
-        "controller/friend/accept-decline.php?timeStamp=" +
+        "controller/friend/send.php?timeStamp=" +
         GenerateRandomCode.TextCode(8),
       {
         method: "POST",
@@ -46,7 +34,7 @@ function FriendAccept(props) {
           emailS2: props.user_account_2, 
           emailS1: props.emailS,
           codeS: props.codeS,
-          command: command,
+          command: command
         }),
       }
     )
@@ -102,7 +90,7 @@ function FriendAccept(props) {
       });
   };
   return (
-    <Box my="2.5" mx="2" px="1" pt="1" bgColor="white">
+    <Box my="1" mx="2" px="1" bgColor="white">
       <HStack direction="row" space={8} px="2" mt="3">
         <VStack>
           <Avatar
@@ -132,18 +120,13 @@ function FriendAccept(props) {
               </HStack>
             </VStack>
             <Spacer w="5" />
-            <VStack>
-              <HStack>
-                <Time_show time_distance_5={time_distance_5} time_modified={time_modified}/>
-              </HStack>
-            </VStack>
           </Flex>
           <HStack>
-            <Button variant="solid" mr="3" px="7" bgColor="#137950" onPress={() => accept_declineFunction(1)}>
-              Chấp nhận
+            <Button variant="solid" mr="3" px="7" bgColor="#137950" onPress={() => sendFunction(1)}>
+              Gửi kết bạn
             </Button>
-            <Button variant="solid" px="7" bgColor="#B5B6B0" onPress={() => accept_declineFunction(0)}>
-              Xóa
+            <Button variant="solid" mr="3" px="7" bgColor="red.600" onPress={() => sendFunction(2)}>
+              Gỡ
             </Button>
           </HStack>
         </VStack>
@@ -152,4 +135,4 @@ function FriendAccept(props) {
   );
 }
 
-export default React.memo(FriendAccept);
+export default React.memo(FriendSuggest);

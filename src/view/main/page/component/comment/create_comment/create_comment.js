@@ -19,10 +19,10 @@ import link from "../../../../../../config/const.js";
 import image_show from "./img_up_show/img_up_show";
 import ToastAlert from "../../alert.js";
 
-function Create_comment({ emailS, codeS, post_id }) {
-  const toast = useToast();
+function Create_comment({ emailS, codeS, post_id, refreshData }) {
   const dimensions = Dimensions.get("window");
   const mime = require("mime");
+  const toast = useToast();
 
   const SignupSchema = Yup.object().shape({
     comment_body: Yup.string()
@@ -177,21 +177,68 @@ function Create_comment({ emailS, codeS, post_id }) {
             body: JSON.stringify(values),
           }
         )
-          .then((res) => res.text())
+          .then((res) => res.json())
           .then((data) => {
             console.log("Success:", data);
+            if (data?.code === "COMMENT_CREATE_OK") {
+              refreshData();
+              actions.setSubmitting(false);
+            } else if (data?.code === "COMMENT_CREATE_OK_NOTIFY_FAIL") {
+              actions.setSubmitting(false);
+              toast.show({
+                render: ({ id }) => {
+                  return (
+                    <ToastAlert
+                      id={id}
+                      title="Gửi thành công"
+                      variant="solid"
+                      description="Lỗi tạo notify"
+                      isClosable={true}
+                    />
+                  );
+                },
+              });
+            } else {
+              actions.setSubmitting(false);
+              toast.show({
+                render: ({ id }) => {
+                  return (
+                    <ToastAlert
+                      id={id}
+                      title="Tạo bình luận thất bại"
+                      variant="solid"
+                      description="Vui lòng thử lại"
+                      isClosable={true}
+                    />
+                  );
+                },
+              });
+            }
           })
           .catch((error) => {
+            actions.setSubmitting(false);
             console.error("Error:", error);
+            toast.show({
+              render: ({ id }) => {
+                return (
+                  <ToastAlert
+                    id={id}
+                    title="Tạo bài thất bại"
+                    variant="solid"
+                    description={"Error: " + error + ". Vui lòng thử lại"}
+                    isClosable={true}
+                  />
+                );
+              },
+            });
           });
 
         //upload images later
-        if (images !== undefined && images !== null) {
+        if (images.length > 0 && images !== null) {
           if (images.length === 1) handleImage1();
           else handleImage2();
         }
-
-        console.log("send");
+        
         actions.setSubmitting(false);
 
         //reset form input
@@ -255,6 +302,8 @@ function Create_comment({ emailS, codeS, post_id }) {
                 size: "xl",
               }}
               onPress={() => handleSubmit()}
+              isLoading={isSubmitting}
+              isLoadingText="Đang tạo"
             />
           </HStack>
           <HStack alignContent="center" px="3">

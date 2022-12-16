@@ -7,7 +7,7 @@ import SinglePost from "./component/post/single_post/single_post";
 import New_post from "./component/post/single_post/new_post_button";
 import link from "../../../config/const";
 
-function Home({ navigation, emailS, codeS }) {
+function Home({ navigation, emailS, codeS, this_user_id }) {
   const [showNumber, setShowNumber] = React.useState(0);
   const [refresh_now, setRefresh] = React.useState(false);
   const [load_more, setLoadMore] = React.useState(false);
@@ -34,7 +34,7 @@ function Home({ navigation, emailS, codeS }) {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log("Success", data);
+        //console.log("Success", data);
         if (parseInt(data?.id) !== 1) {
           setCantLoadMore(true);
           setLoadMore(false);
@@ -46,12 +46,13 @@ function Home({ navigation, emailS, codeS }) {
         }
       })
       .catch((error) => {
-        console.error("Error:", error);
+        //console.error("Error:", error);
       });
 
     setLoadMore(false);
   };
-  console.log(post_list);
+
+  //console.log(post_list);
 
   const refreshData = async () => {
     const getPost_link =
@@ -71,18 +72,18 @@ function Home({ navigation, emailS, codeS }) {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log("Success:", data);
+        //console.log("Success:", data);
 
         if (parseInt(data?.id) === 0) {
           setCantLoadMore(true);
         } else if (parseInt(data?.id) === 1) {
           let response_data = JSON.parse(data?.data);
-          //console.log(response_data);
+          console.log(response_data);
           setPostList(response_data);
         }
       })
       .catch((error) => {
-        console.error("Error:", error);
+        //console.error("Error:", error);
       });
 
     setShowNumber(5);
@@ -114,6 +115,9 @@ function Home({ navigation, emailS, codeS }) {
         emailS={emailS}
         codeS={codeS}
         navigation={navigation}
+        user_id={this_user_id}
+        publicity_state={item?.Post.publicity_state}
+        fullView={false}
       />
     );
   };
@@ -159,7 +163,7 @@ function Home({ navigation, emailS, codeS }) {
           renderItem={memoizedValue}
           keyExtractor={(item) => item?.Post.id}
           ListHeaderComponent={() => {
-            return <New_post emailS={emailS} codeS={codeS} />;
+            return <New_post this_user_id={this_user_id} emailS={emailS} codeS={codeS} />;
           }}
           onEndReachedThreshold={0.5}
           ListFooterComponent={!cant_load_more && memoLoadingScreen()}
