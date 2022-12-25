@@ -30,7 +30,6 @@ import Menu from "./page/menu";
 import { memo } from "react";
 
 function Main({ emailS, codeS, this_user_id }) {
-  const [show, setShow] = React.useState(false);
 
   const Tab = createMaterialTopTabNavigator();
   return (
@@ -116,8 +115,13 @@ function Main({ emailS, codeS, this_user_id }) {
         />
         <Tab.Screen
           name="NotifyList"
-          children={() => (
-            <NotifyList codeS={codeS} emailS={emailS}></NotifyList>
+          children={({ navigation }) => (
+            <NotifyList
+              this_user_id={this_user_id}
+              codeS={codeS}
+              emailS={emailS}
+              navigation={navigation}
+            ></NotifyList>
           )}
           options={{
             tabBarLabel: "",
@@ -129,7 +133,14 @@ function Main({ emailS, codeS, this_user_id }) {
         />
         <Tab.Screen
           name="Menu"
-          children={() => <Menu codeS={codeS} emailS={emailS}></Menu>}
+          children={(props) => (
+            <Menu
+              codeS={codeS}
+              emailS={emailS}
+              this_user_id={this_user_id}
+              route_params={props.route.params}
+            ></Menu>
+          )}
           options={{
             tabBarLabel: "",
             tabBarShowLabel: false,
